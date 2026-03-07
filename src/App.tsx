@@ -118,94 +118,6 @@ interface Emotion {
 
 const EMOTIONS: Emotion[] = [
   {
-    id: "FEAR",
-    name: { pl: "Strach", en: "Fear" },
-    desc: {
-      pl: "Ciało rozpoznaje siłę wyższą od siebie. Priorytetem jest zachowanie integralności poprzez wycofanie.",
-      en: "The body recognizes a force greater than itself. Priority is to preserve integrity by withdrawing.",
-    },
-    stimulus: { pl: "ZAGROŻENIE", en: "THREAT" },
-    impulse: { pl: "Napięcie / Alarm", en: "Tension / Alarm" },
-    action: { pl: "UCIECZKA / UNIK", en: "ESCAPE / AVOIDANCE" },
-    function: { pl: "OCHRONA", en: "PROTECTION" },
-    intensity: {
-      low: { pl: "Niepokój", en: "Anxiety" },
-      medium: { pl: "Strach", en: "Fear" },
-      high: { pl: "Przerażenie", en: "Terror" }
-    },
-    vector: { pl: "DO TYŁU / KURCZENIE SIĘ", en: "BACKWARD / CONTRACTION" },
-    signals: {
-      pl: [
-        "Przyspieszone bicie serca (kołatanie)",
-        "Płytki, szybki oddech lub wstrzymywanie powietrza",
-        "Bladość twarzy, odpływ krwi z kończyn",
-        "Zimny pot (szczególnie na czole i dłoniach)",
-        "Drżenie rąk, kolan lub warg",
-        "Szeroko otwarte oczy, rozszerzone źrenice",
-        "Suchość w ustach (częste przełykanie śliny)",
-        "Odruchowe kulenie się (osłanianie szyi/brzucha)"
-      ],
-      en: [
-        "Accelerated heartbeat (palpitations)",
-        "Shallow, rapid breathing or holding breath",
-        "Pale face, blood draining from limbs",
-        "Cold sweat (especially on forehead and palms)",
-        "Trembling hands, knees or lips",
-        "Wide open eyes, dilated pupils",
-        "Dry mouth (frequent swallowing)",
-        "Reflexive crouching (shielding neck/belly)"
-      ]
-    },
-    colorClass: "text-emerald-500",
-    bgLightClass: "bg-emerald-500/10",
-    hex: "#10b981",
-    icon: AlertTriangle,
-  },
-  {
-    id: "ANGER",
-    name: { pl: "Gniew", en: "Anger" },
-    desc: {
-      pl: "Organizm rozpoznaje przeszkodę, którą może pokonać. Mobilizacja energii do walki.",
-      en: "The organism recognizes an obstacle it can overcome. Mobilization of energy to fight.",
-    },
-    stimulus: { pl: "PRZESZKODA", en: "OBSTACLE" },
-    impulse: { pl: "Gorąco / Adrenalina", en: "Heat / Adrenaline" },
-    action: { pl: "ATAK / PRZEBICIE", en: "ATTACK / BREAKTHROUGH" },
-    function: { pl: "DESTRUKCJA", en: "DESTRUCTION" },
-    intensity: {
-      low: { pl: "Irytacja", en: "Annoyance" },
-      medium: { pl: "Gniew", en: "Anger" },
-      high: { pl: "Wściekłość", en: "Rage" }
-    },
-    vector: { pl: "DO PRZODU / TARCIE", en: "FORWARD / FRICTION" },
-    signals: {
-      pl: [
-        "Zaciśnięte szczęki, zgrzytanie zębami",
-        "Czerwienienie się twarzy i szyi",
-        "Rozdęte nozdrza",
-        "Zaciśnięte pięści (bielenie knykci)",
-        "Wysunięcie żuchwy lub głowy do przodu",
-        "Napięcie mięśni ramion i karku",
-        "Głośniejszy, szorstki ton głosu",
-        "Intensywny kontakt wzrokowy (tunelowe widzenie)"
-      ],
-      en: [
-        "Clenched jaws, grinding teeth",
-        "Reddening of face and neck",
-        "Flaring nostrils",
-        "Clenched fists (whitening knuckles)",
-        "Jutting jaw or head forward",
-        "Tension in shoulder and neck muscles",
-        "Louder, harsh voice tone",
-        "Intense eye contact (tunnel vision)"
-      ]
-    },
-    colorClass: "text-red-500",
-    bgLightClass: "bg-red-500/10",
-    hex: "#ef4444",
-    icon: Flame,
-  },
-  {
     id: "JOY",
     name: { pl: "Radość", en: "Joy" },
     desc: {
@@ -248,50 +160,6 @@ const EMOTIONS: Emotion[] = [
     bgLightClass: "bg-yellow-500/10",
     hex: "#eab308",
     icon: Zap,
-  },
-  {
-    id: "SADNESS",
-    name: { pl: "Smutek", en: "Sadness" },
-    desc: {
-      pl: "Sygnał dla grupy o potrzebie wsparcia ('Pomóż mi'). Oszczędzanie energii w obliczu nieodwracalnej straty.",
-      en: "Signal to the group for support ('Help me'). Conserving energy in the face of irreversible loss.",
-    },
-    stimulus: { pl: "UTRATA", en: "LOSS" },
-    impulse: { pl: "Ciężar / Zapadanie", en: "Heaviness / Sinking" },
-    action: { pl: "PŁACZ / BEZRUCH", en: "CRYING / STILLNESS" },
-    function: { pl: "REINTEGRACJA", en: "REINTEGRATION" },
-    intensity: {
-      low: { pl: "Zaduma", en: "Pensiveness" },
-      medium: { pl: "Smutek", en: "Sadness" },
-      high: { pl: "Rozpacz", en: "Grief" }
-    },
-    vector: { pl: "W DÓŁ / DO ŚRODKA", en: "DOWNWARD / INWARD" },
-    signals: {
-      pl: [
-        "Opadające kąciki ust i powiek",
-        "Wzrok wbity w ziemię lub 'nieobecny'",
-        "Zgarbiona sylwetka, zapadnięta klatka piersiowa",
-        "Powolne, ociężałe ruchy (letarg)",
-        "Cichy, monotonny lub łamiący się głos",
-        "Łzy, szklące się oczy",
-        "Zasłanianie twarzy dłońmi",
-        "Apatia, brak reakcji na bodźce zewnętrzne"
-      ],
-      en: [
-        "Drooping corners of mouth and eyelids",
-        "Gaze fixed on the ground or 'absent'",
-        "Slumped silhouette, sunken chest",
-        "Slow, heavy movements (lethargy)",
-        "Quiet, monotone or breaking voice",
-        "Tears, glassy eyes",
-        "Covering face with hands",
-        "Apathy, lack of reaction to external stimuli"
-      ]
-    },
-    colorClass: "text-blue-500",
-    bgLightClass: "bg-blue-500/10",
-    hex: "#3b82f6",
-    icon: Anchor,
   },
   {
     id: "TRUST",
@@ -338,92 +206,48 @@ const EMOTIONS: Emotion[] = [
     icon: UserCheck,
   },
   {
-    id: "DISGUST",
-    name: { pl: "Wstręt", en: "Disgust" },
+    id: "FEAR",
+    name: { pl: "Strach", en: "Fear" },
     desc: {
-      pl: "Ochrona organizmu przed zatruciem fizycznym (jedzenie) lub moralnym (zachowanie).",
-      en: "Protection of the organism against physical poisoning (food) or moral poisoning (behavior).",
+      pl: "Ciało rozpoznaje siłę wyższą od siebie. Priorytetem jest zachowanie integralności poprzez wycofanie.",
+      en: "The body recognizes a force greater than itself. Priority is to preserve integrity by withdrawing.",
     },
-    stimulus: { pl: "TOKSYNA", en: "TOXIN" },
-    impulse: { pl: "Mdłości / Skurcz", en: "Nausea / Contraction" },
-    action: { pl: "WYPYCHANIE / PLUCIE", en: "PUSHING AWAY / SPITTING" },
-    function: { pl: "ODRZUCENIE", en: "REJECTION" },
+    stimulus: { pl: "ZAGROŻENIE", en: "THREAT" },
+    impulse: { pl: "Napięcie / Alarm", en: "Tension / Alarm" },
+    action: { pl: "UCIECZKA / UNIK", en: "ESCAPE / AVOIDANCE" },
+    function: { pl: "OCHRONA", en: "PROTECTION" },
     intensity: {
-      low: { pl: "Niechęć", en: "Boredom" },
-      medium: { pl: "Wstręt", en: "Disgust" },
-      high: { pl: "Odraza", en: "Loathing" }
+      low: { pl: "Niepokój", en: "Anxiety" },
+      medium: { pl: "Strach", en: "Fear" },
+      high: { pl: "Przerażenie", en: "Terror" }
     },
-    vector: { pl: "OD SIEBIE / BLOKADA", en: "AWAY FROM SELF / BLOCKING" },
+    vector: { pl: "DO TYŁU / KURCZENIE SIĘ", en: "BACKWARD / CONTRACTION" },
     signals: {
       pl: [
-        "Marszczenie nosa",
-        "Uniesienie górnej wargi (grymas)",
-        "Mrużenie oczu (ograniczenie pola widzenia)",
-        "Odwracanie głowy od źródła bodźca",
-        "Zasłanianie ust lub nosa dłonią",
-        "Odruch wymiotny, przełykanie śliny",
-        "Cofanie tułowia (odchylenie w tył)",
-        "Zaciskanie ust (blokada przed wniknięciem)"
+        "Przyspieszone bicie serca (kołatanie)",
+        "Płytki, szybki oddech lub wstrzymywanie powietrza",
+        "Bladość twarzy, odpływ krwi z kończyn",
+        "Zimny pot (szczególnie na czole i dłoniach)",
+        "Drżenie rąk, kolan lub warg",
+        "Szeroko otwarte oczy, rozszerzone źrenice",
+        "Suchość w ustach (częste przełykanie śliny)",
+        "Odruchowe kulenie się (osłanianie szyi/brzucha)"
       ],
       en: [
-        "Wrinkling nose",
-        "Raising upper lip (sneer)",
-        "Squinting eyes (limiting field of vision)",
-        "Turning head away from stimulus source",
-        "Covering mouth or nose with hand",
-        "Gag reflex, swallowing saliva",
-        "Retracting torso (leaning back)",
-        "Purging lips (blocking entry)"
+        "Accelerated heartbeat (palpitations)",
+        "Shallow, rapid breathing or holding breath",
+        "Pale face, blood draining from limbs",
+        "Cold sweat (especially on forehead and palms)",
+        "Trembling hands, knees or lips",
+        "Wide open eyes, dilated pupils",
+        "Dry mouth (frequent swallowing)",
+        "Reflexive crouching (shielding neck/belly)"
       ]
     },
-    colorClass: "text-purple-500",
-    bgLightClass: "bg-purple-500/10",
-    hex: "#a855f7",
-    icon: MinusCircle,
-  },
-  {
-    id: "ANTICIPATION",
-    name: { pl: "Oczekiwanie", en: "Anticipation" },
-    desc: {
-      pl: "Aktywne poszukiwanie informacji. Przygotowanie ciała na to, co dopiero nadejdzie.",
-      en: "Active search for information. Preparing the body for what is yet to come.",
-    },
-    stimulus: { pl: "NIEZNANE TERYTORIUM", en: "UNKNOWN TERRITORY" },
-    impulse: { pl: "Wyostrzenie zmysłów", en: "Sharpening of senses" },
-    action: { pl: "SKANOWANIE / TROPIENIE", en: "SCANNING / TRACKING" },
-    function: { pl: "EKSPLORACJA", en: "EXPLORATION" },
-    intensity: {
-      low: { pl: "Ciekawość", en: "Interest" },
-      medium: { pl: "Oczekiwanie", en: "Anticipation" },
-      high: { pl: "Czujność", en: "Vigilance" }
-    },
-    vector: { pl: "DO PRZODU (Głowa)", en: "FORWARD (Head)" },
-    signals: {
-      pl: [
-        "Rozszerzone źrenice (chęć chłonięcia informacji)",
-        "Lekkie napięcie mięśni (gotowość do startu)",
-        "Oblizywanie ust (z niepokoju lub ekscytacji)",
-        "Wiercenie się, tupanie, bębnienie palcami",
-        "Wpatrywanie się w jeden punkt (np. drzwi, telefon)",
-        "Pochylenie głowy lub tułowia do przodu",
-        "Wstrzymywanie oddechu w kluczowych momentach",
-        "Skanowanie otoczenia wzrokiem"
-      ],
-      en: [
-        "Dilated pupils (desire to absorb information)",
-        "Slight muscle tension (readiness to start)",
-        "Licking lips (from anxiety or excitement)",
-        "Fidgeting, tapping, drumming fingers",
-        "Staring at one point (e.g., door, phone)",
-        "Leaning head or torso forward",
-        "Holding breath at key moments",
-        "Scanning the environment with eyes"
-      ]
-    },
-    colorClass: "text-orange-500",
-    bgLightClass: "bg-orange-500/10",
-    hex: "#f97316",
-    icon: EyeIcon,
+    colorClass: "text-emerald-500",
+    bgLightClass: "bg-emerald-500/10",
+    hex: "#10b981",
+    icon: AlertTriangle,
   },
   {
     id: "SURPRISE",
@@ -468,6 +292,182 @@ const EMOTIONS: Emotion[] = [
     bgLightClass: "bg-cyan-500/10",
     hex: "#06b6d4",
     icon: Maximize2,
+  },
+  {
+    id: "SADNESS",
+    name: { pl: "Smutek", en: "Sadness" },
+    desc: {
+      pl: "Sygnał dla grupy o potrzebie wsparcia ('Pomóż mi'). Oszczędzanie energii w obliczu nieodwracalnej straty.",
+      en: "Signal to the group for support ('Help me'). Conserving energy in the face of irreversible loss.",
+    },
+    stimulus: { pl: "UTRATA", en: "LOSS" },
+    impulse: { pl: "Ciężar / Zapadanie", en: "Heaviness / Sinking" },
+    action: { pl: "PŁACZ / BEZRUCH", en: "CRYING / STILLNESS" },
+    function: { pl: "REINTEGRACJA", en: "REINTEGRATION" },
+    intensity: {
+      low: { pl: "Zaduma", en: "Pensiveness" },
+      medium: { pl: "Smutek", en: "Sadness" },
+      high: { pl: "Rozpacz", en: "Grief" }
+    },
+    vector: { pl: "W DÓŁ / DO ŚRODKA", en: "DOWNWARD / INWARD" },
+    signals: {
+      pl: [
+        "Opadające kąciki ust i powiek",
+        "Wzrok wbity w ziemię lub 'nieobecny'",
+        "Zgarbiona sylwetka, zapadnięta klatka piersiowa",
+        "Powolne, ociężałe ruchy (letarg)",
+        "Cichy, monotonny lub łamiący się głos",
+        "Łzy, szklące się oczy",
+        "Zasłanianie twarzy dłońmi",
+        "Apatia, brak reakcji na bodźce zewnętrzne"
+      ],
+      en: [
+        "Drooping corners of mouth and eyelids",
+        "Gaze fixed on the ground or 'absent'",
+        "Slumped silhouette, sunken chest",
+        "Slow, heavy movements (lethargy)",
+        "Quiet, monotone or breaking voice",
+        "Tears, glassy eyes",
+        "Covering face with hands",
+        "Apathy, lack of reaction to external stimuli"
+      ]
+    },
+    colorClass: "text-blue-500",
+    bgLightClass: "bg-blue-500/10",
+    hex: "#3b82f6",
+    icon: Anchor,
+  },
+  {
+    id: "DISGUST",
+    name: { pl: "Wstręt", en: "Disgust" },
+    desc: {
+      pl: "Ochrona organizmu przed zatruciem fizycznym (jedzenie) lub moralnym (zachowanie).",
+      en: "Protection of the organism against physical poisoning (food) or moral poisoning (behavior).",
+    },
+    stimulus: { pl: "TOKSYNA", en: "TOXIN" },
+    impulse: { pl: "Mdłości / Skurcz", en: "Nausea / Contraction" },
+    action: { pl: "WYPYCHANIE / PLUCIE", en: "PUSHING AWAY / SPITTING" },
+    function: { pl: "ODRZUCENIE", en: "REJECTION" },
+    intensity: {
+      low: { pl: "Niechęć", en: "Boredom" },
+      medium: { pl: "Wstręt", en: "Disgust" },
+      high: { pl: "Odraza", en: "Loathing" }
+    },
+    vector: { pl: "OD SIEBIE / BLOKADA", en: "AWAY FROM SELF / BLOCKING" },
+    signals: {
+      pl: [
+        "Marszczenie nosa",
+        "Uniesienie górnej wargi (grymas)",
+        "Mrużenie oczu (ograniczenie pola widzenia)",
+        "Odwracanie głowy od źródła bodźca",
+        "Zasłanianie ust lub nosa dłonią",
+        "Odruch wymiotny, przełykanie śliny",
+        "Cofanie tułowia (odchylenie w tył)",
+        "Zaciskanie ust (blokada przed wniknięciem)"
+      ],
+      en: [
+        "Wrinkling nose",
+        "Raising upper lip (sneer)",
+        "Squinting eyes (limiting field of vision)",
+        "Turning head away from stimulus source",
+        "Covering mouth or nose with hand",
+        "Gag reflex, swallowing saliva",
+        "Retracting torso (leaning back)",
+        "Purging lips (blocking entry)"
+      ]
+    },
+    colorClass: "text-purple-500",
+    bgLightClass: "bg-purple-500/10",
+    hex: "#a855f7",
+    icon: MinusCircle,
+  },
+  {
+    id: "ANGER",
+    name: { pl: "Gniew", en: "Anger" },
+    desc: {
+      pl: "Organizm rozpoznaje przeszkodę, którą może pokonać. Mobilizacja energii do walki.",
+      en: "The organism recognizes an obstacle it can overcome. Mobilization of energy to fight.",
+    },
+    stimulus: { pl: "PRZESZKODA", en: "OBSTACLE" },
+    impulse: { pl: "Gorąco / Adrenalina", en: "Heat / Adrenaline" },
+    action: { pl: "ATAK / PRZEBICIE", en: "ATTACK / BREAKTHROUGH" },
+    function: { pl: "DESTRUKCJA", en: "DESTRUCTION" },
+    intensity: {
+      low: { pl: "Irytacja", en: "Annoyance" },
+      medium: { pl: "Gniew", en: "Anger" },
+      high: { pl: "Wściekłość", en: "Rage" }
+    },
+    vector: { pl: "DO PRZODU / TARCIE", en: "FORWARD / FRICTION" },
+    signals: {
+      pl: [
+        "Zaciśnięte szczęki, zgrzytanie zębami",
+        "Czerwienienie się twarzy i szyi",
+        "Rozdęte nozdrza",
+        "Zaciśnięte pięści (bielenie knykci)",
+        "Wysunięcie żuchwy lub głowy do przodu",
+        "Napięcie mięśni ramion i karku",
+        "Głośniejszy, szorstki ton głosu",
+        "Intensywny kontakt wzrokowy (tunelowe widzenie)"
+      ],
+      en: [
+        "Clenched jaws, grinding teeth",
+        "Reddening of face and neck",
+        "Flaring nostrils",
+        "Clenched fists (whitening knuckles)",
+        "Jutting jaw or head forward",
+        "Tension in shoulder and neck muscles",
+        "Louder, harsh voice tone",
+        "Intense eye contact (tunnel vision)"
+      ]
+    },
+    colorClass: "text-red-500",
+    bgLightClass: "bg-red-500/10",
+    hex: "#ef4444",
+    icon: Flame,
+  },
+  {
+    id: "ANTICIPATION",
+    name: { pl: "Oczekiwanie", en: "Anticipation" },
+    desc: {
+      pl: "Aktywne poszukiwanie informacji. Przygotowanie ciała na to, co dopiero nadejdzie.",
+      en: "Active search for information. Preparing the body for what is yet to come.",
+    },
+    stimulus: { pl: "NIEZNANE TERYTORIUM", en: "UNKNOWN TERRITORY" },
+    impulse: { pl: "Wyostrzenie zmysłów", en: "Sharpening of senses" },
+    action: { pl: "SKANOWANIE / TROPIENIE", en: "SCANNING / TRACKING" },
+    function: { pl: "EKSPLORACJA", en: "EXPLORATION" },
+    intensity: {
+      low: { pl: "Ciekawość", en: "Interest" },
+      medium: { pl: "Oczekiwanie", en: "Anticipation" },
+      high: { pl: "Czujność", en: "Vigilance" }
+    },
+    vector: { pl: "DO PRZODU (Głowa)", en: "FORWARD (Head)" },
+    signals: {
+      pl: [
+        "Rozszerzone źrenice (chęć chłonięcia informacji)",
+        "Lekkie napięcie mięśni (gotowość do startu)",
+        "Oblizywanie ust (z niepokoju lub ekscytacji)",
+        "Wiercenie się, tupanie, bębnienie palcami",
+        "Wpatrywanie się w jeden punkt (np. drzwi, telefon)",
+        "Pochylenie głowy lub tułowia do przodu",
+        "Wstrzymywanie oddechu w kluczowych momentach",
+        "Skanowanie otoczenia wzrokiem"
+      ],
+      en: [
+        "Dilated pupils (desire to absorb information)",
+        "Slight muscle tension (readiness to start)",
+        "Licking lips (from anxiety or excitement)",
+        "Fidgeting, tapping, drumming fingers",
+        "Staring at one point (e.g., door, phone)",
+        "Leaning head or torso forward",
+        "Holding breath at key moments",
+        "Scanning the environment with eyes"
+      ]
+    },
+    colorClass: "text-orange-500",
+    bgLightClass: "bg-orange-500/10",
+    hex: "#f97316",
+    icon: EyeIcon,
   },
 ]
 
@@ -786,23 +786,37 @@ const App: React.FC = () => {
                 <p className="text-xs sm:text-sm opacity-60 leading-relaxed px-4">{t.dyadsDesc}</p>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-stretch justify-center gap-3 sm:gap-6 mb-8 w-full max-w-3xl">
+              <div className="flex justify-center items-center mb-8 sm:mb-12 relative h-40 sm:h-56 w-full max-w-[16rem] sm:max-w-sm mx-auto">
                 {/* Emotion 1 */}
-                <div className={`flex flex-col items-center justify-center p-6 sm:p-8 rounded-3xl w-full sm:w-2/5 border-2 shadow-sm ${isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"}`}>
-                  <Icon1 className={`w-16 h-16 sm:w-20 sm:h-20 mb-4 ${dyadPair[0].colorClass}`} strokeWidth={1.5} />
-                  <h3 className={`text-xl sm:text-2xl font-black uppercase tracking-tight text-center ${dyadPair[0].colorClass}`}>
-                    {dyadPair[0].name[lang]}
-                  </h3>
+                <div
+                  className={`absolute left-0 w-40 h-40 sm:w-56 sm:h-56 rounded-full flex flex-col items-center justify-center p-4 shadow-xl border-4 sm:border-8 mix-blend-multiply dark:mix-blend-screen transition-all duration-500 ${
+                    isDark ? "border-slate-950 bg-slate-900" : "border-slate-50 bg-white"
+                  }`}
+                  style={{ zIndex: 2 }}
+                >
+                  <div className={`absolute inset-0 rounded-full opacity-60 ${dyadPair[0].bgLightClass}`} />
+                  <div className="relative z-10 flex flex-col items-center">
+                    <Icon1 className={`w-12 h-12 sm:w-16 sm:h-16 mb-2 sm:mb-3 ${dyadPair[0].colorClass}`} strokeWidth={1.5} />
+                    <h3 className={`text-sm sm:text-xl font-black uppercase tracking-tight text-center ${dyadPair[0].colorClass}`}>
+                      {dyadPair[0].name[lang]}
+                    </h3>
+                  </div>
                 </div>
 
-                <div className="text-3xl sm:text-4xl font-black opacity-20 flex items-center justify-center py-2 sm:py-0">+</div>
-
                 {/* Emotion 2 */}
-                <div className={`flex flex-col items-center justify-center p-6 sm:p-8 rounded-3xl w-full sm:w-2/5 border-2 shadow-sm ${isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"}`}>
-                  <Icon2 className={`w-16 h-16 sm:w-20 sm:h-20 mb-4 ${dyadPair[1].colorClass}`} strokeWidth={1.5} />
-                  <h3 className={`text-xl sm:text-2xl font-black uppercase tracking-tight text-center ${dyadPair[1].colorClass}`}>
-                    {dyadPair[1].name[lang]}
-                  </h3>
+                <div
+                  className={`absolute right-0 w-40 h-40 sm:w-56 sm:h-56 rounded-full flex flex-col items-center justify-center p-4 shadow-xl border-4 sm:border-8 mix-blend-multiply dark:mix-blend-screen transition-all duration-500 ${
+                    isDark ? "border-slate-950 bg-slate-900" : "border-slate-50 bg-white"
+                  }`}
+                  style={{ zIndex: 1 }}
+                >
+                  <div className={`absolute inset-0 rounded-full opacity-60 ${dyadPair[1].bgLightClass}`} />
+                  <div className="relative z-10 flex flex-col items-center">
+                    <Icon2 className={`w-12 h-12 sm:w-16 sm:h-16 mb-2 sm:mb-3 ${dyadPair[1].colorClass}`} strokeWidth={1.5} />
+                    <h3 className={`text-sm sm:text-xl font-black uppercase tracking-tight text-center ${dyadPair[1].colorClass}`}>
+                      {dyadPair[1].name[lang]}
+                    </h3>
+                  </div>
                 </div>
               </div>
 
