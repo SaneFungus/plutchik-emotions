@@ -1,2 +1,2 @@
-# tis-mw2
+# 8 Emocji Roberta Plutchika
 
