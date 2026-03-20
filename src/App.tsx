@@ -19,11 +19,12 @@ import {
   Eye as EyeIcon,
   Maximize2,
   Move,
-  Fingerprint,
-  BarChart2,
-  ArrowRight,
-  ArrowDown,
-  X
+  X,
+  User,
+  Focus,
+  Compass,
+  Wind,
+  Info
 } from "lucide-react"
 
 // ─── Tłumaczenia interfejsu (UI) ─────────────────────────────────
@@ -39,25 +40,15 @@ const uiTranslations = {
     dyadsBtn: "LOSUJ PARĘ",
     catalogTitle: "Katalog Podstawowy",
     modal: {
-      mechanism: "Mechanizm Powstawania (Teoria Plutchika & Jamesa-Langego)",
-      neuroception: "*Neurocepcja: Ciało reaguje na bodziec (impuls) szybciej niż umysł nada mu nazwę (emocja).",
-      motorics: "Motoryka",
-      movementVector: "Wektor ruchu",
-      bodyDictionary: "Słownik Ciała (Sygnały Somatyczne)",
-      bodyDictDesc: "Zewnętrzne i wewnętrzne objawy fizjologiczne. Skorzystaj z nich, by zbudować wiarygodną reakcję postaci.",
-      actorPerspective: "Perspektywa Aktora",
-      bodySignal: "Sygnał z ciała (Co czuję?)",
-      scenicGoal: "Cel sceniczny (Zadanie)",
-      remember: "Pamiętaj: Ciało nie kłamie. Zagraj impuls (napięcie/rozluźnienie), a emocja pojawi się sama.",
-      back: "Zamknij",
-      stimulus: "Bodziec",
-      impulse: "Impuls",
-      emotion: "Emocja",
-      action: "Działanie",
       bioGoal: "Cel Biologiczny",
-      energyScale: "Skala Energii (Intensywność)",
-      affect: "Afekt",
-      signal: "Sygnał"
+      movementVector: "Wektor ruchu",
+      introNote: "Pamiętaj — to nie są recepty. To propozycje wejścia. Każda zaczyna się od neutralnego stania, z zamkniętymi oczami, po kilku oddechach.",
+      bodyInSpace: "Ciało-w-przestrzeni",
+      attentionQuality: "Jakość uwagi",
+      internalLandscape: "Wewnętrzny krajobraz",
+      breath: "Oddech",
+      impulse: "Impuls",
+      action: "Działanie"
     }
   },
   en: {
@@ -71,49 +62,38 @@ const uiTranslations = {
     dyadsBtn: "RANDOM PAIR",
     catalogTitle: "Primary Catalog",
     modal: {
-      mechanism: "Mechanism of Origin (Plutchik & James-Lange Theory)",
-      neuroception: "*Neuroception: The body reacts to a stimulus faster than the mind names it.",
-      motorics: "Motorics",
-      movementVector: "Movement Vector",
-      bodyDictionary: "Body Dictionary (Somatic Signals)",
-      bodyDictDesc: "External and internal physiological symptoms. Use them to build a credible character reaction.",
-      actorPerspective: "Actor's Perspective",
-      bodySignal: "Body Signal (What do I feel?)",
-      scenicGoal: "Scenic Goal (Task)",
-      remember: "Remember: The body doesn't lie. Play the impulse, and the emotion will appear by itself.",
-      back: "Close",
-      stimulus: "Stimulus",
-      impulse: "Impulse",
-      emotion: "Emotion",
-      action: "Action",
       bioGoal: "Biological Goal",
-      energyScale: "Energy Scale (Intensity)",
-      affect: "Affect",
-      signal: "Signal"
+      movementVector: "Movement Vector",
+      introNote: "Remember — these are not prescriptions. They are entry proposals. Each starts from a neutral standing position, eyes closed, after a few breaths.",
+      bodyInSpace: "Body-in-space",
+      attentionQuality: "Quality of attention",
+      internalLandscape: "Internal landscape",
+      breath: "Breath",
+      impulse: "Impulse",
+      action: "Action"
     }
   }
 }
 
-// ─── Data: 8 Basic Emotions + Rich Actor Data ──────────────────────
+// ─── Data: 8 Basic Emotions + New Actor Instructions ─────────────
 interface Emotion {
   id: string
   name: { pl: string; en: string }
   desc: { pl: string; en: string }
-  stimulus: { pl: string; en: string }
   impulse: { pl: string; en: string }
   action: { pl: string; en: string }
   function: { pl: string; en: string }
-  intensity: {
-    low: { pl: string; en: string }
-    medium: { pl: string; en: string }
-    high: { pl: string; en: string }
-  }
   vector: { pl: string; en: string }
-  signals: { pl: string[]; en: string[] }
   colorClass: string
   bgLightClass: string
   hex: string
   icon: React.ElementType
+  actorGuide: {
+    body: { pl: string; en: string }
+    attention: { pl: string; en: string }
+    internal: { pl: string; en: string }
+    breath: { pl: string; en: string }
+  }
 }
 
 const EMOTIONS: Emotion[] = [
@@ -121,133 +101,103 @@ const EMOTIONS: Emotion[] = [
     id: "JOY",
     name: { pl: "Radość", en: "Joy" },
     desc: {
-      pl: "Sygnał bezpieczeństwa i siły ('Mam zasoby!'). Napędza taniec godowy, flirt i przyciąganie uwagi.",
-      en: "Signal of safety and strength ('I have resources!'). Drives mating dance, flirtation, and attracting attention.",
+      pl: "Sygnał bezpieczeństwa i siły. Napędza ekspansję, taniec i przyciąganie uwagi.",
+      en: "Signal of safety and strength. Drives expansion, dance, and attracting attention.",
     },
-    stimulus: { pl: "SUKCES / ZASOBY", en: "SUCCESS / RESOURCES" },
     impulse: { pl: "Ekspansja / Energia", en: "Expansion / Energy" },
     action: { pl: "POPISYWANIE SIĘ", en: "SHOWING OFF" },
     function: { pl: "WITALNOŚĆ / ZALOTY", en: "VITALITY / COURTSHIP" },
-    intensity: {
-      low: { pl: "Pogoda ducha", en: "Serenity" },
-      medium: { pl: "Radość", en: "Joy" },
-      high: { pl: "Ekstaza", en: "Ecstasy" }
-    },
     vector: { pl: "W GÓRĘ / NA ZEWNĄTRZ", en: "UPWARD / OUTWARD" },
-    signals: {
-      pl: [
-        "Uniesione kąciki ust (uśmiech angażujący oczy)",
-        "Błyszczące, lekko wilgotne oczy",
-        "Rozluźniona, otwarta postawa ciała",
-        "Podniesiona głowa i klatka piersiowa",
-        "Energiczne, płynne gesty",
-        "Częsty śmiech, chichot",
-        "Eksponowanie szyi i nadgarstków",
-        "Sprężysty krok, 'lekkość' ciała"
-      ],
-      en: [
-        "Raised corners of the mouth (smile engaging eyes)",
-        "Sparkling, slightly moist eyes",
-        "Relaxed, open body posture",
-        "Raised head and chest",
-        "Energetic, fluid gestures",
-        "Frequent laughter, giggling",
-        "Exposing neck and wrists",
-        "Bouncy step, 'lightness' of body"
-      ]
-    },
     colorClass: "text-yellow-500",
     bgLightClass: "bg-yellow-500/10",
     hex: "#eab308",
     icon: Zap,
+    actorGuide: {
+      body: {
+        pl: "Poczuj podłogę pod stopami — a potem poczuj, że coś cię od niej lekko odrywa. Nie unosisz się — ale ciężar staje się mniejszy. Klatka piersiowa rozszerza się, jakby w środku robiło się więcej miejsca. Ręce oddalają się od tułowia — nie dlatego, że je unosisz, ale dlatego, że ciało chce zajmować więcej przestrzeni.",
+        en: "Feel the floor under your feet — and then feel something slightly lifting you from it. You are not floating — but the weight becomes less. The chest expands, as if making more room inside. Arms move away from the torso — not because you lift them, but because the body wants to take up more space."
+      },
+      attention: {
+        pl: "Otwórz oczy. Widzisz szeroko — nie szukasz niczego konkretnego, ale wszystko jest ciekawe. Wzrok jest miękki, nieostry. Kąty pokoju, kolor ścian, światło — wszystko jest lekko jaśniejsze niż powinno.",
+        en: "Open your eyes. You see broadly — you're not looking for anything specific, but everything is interesting. The gaze is soft, unfocused. Corners of the room, wall color, light — everything is slightly brighter than it should be."
+      },
+      internal: {
+        pl: "W środku klatki piersiowej jest ciepło, które się rozprzestrzenia. Nie gorąco — ciepło. Jakby coś dojrzałego, pełnego. To ciepło ma ruch — nie chce zostać w środku. Chce się dzielić, przelewać na zewnątrz.",
+        en: "In the middle of the chest there is a warmth that spreads. Not hot — warm. Like something ripe, full. This warmth has movement — it doesn't want to stay inside. It wants to share, to pour out."
+      },
+      breath: {
+        pl: "Pełny, łatwy. Wydech dłuższy niż wdech. Można powiedzieć, że oddech się „uśmiecha”.",
+        en: "Full, easy. Exhale longer than inhale. You could say the breath is 'smiling'."
+      }
+    }
   },
   {
     id: "TRUST",
     name: { pl: "Zaufanie", en: "Trust" },
     desc: {
-      pl: "Decyzja organizmu o wpuszczeniu kogoś do strefy intymnej. Niezbędna do aktu tworzenia więzi.",
+      pl: "Decyzja organizmu o wpuszczeniu kogoś do strefy intymnej. Niezbędna do tworzenia więzi.",
       en: "Organism's decision to let someone into the intimate zone. Essential for bonding.",
     },
-    stimulus: { pl: "PRZYJACIEL", en: "FRIEND" },
     impulse: { pl: "Rozluźnienie / Ciepło", en: "Relaxation / Warmth" },
     action: { pl: "OTWARCIE GRANIC", en: "OPENING BOUNDARIES" },
     function: { pl: "WIĘŹ / INTYMNOŚĆ", en: "BONDING / INTIMACY" },
-    intensity: {
-      low: { pl: "Akceptacja", en: "Acceptance" },
-      medium: { pl: "Zaufanie", en: "Trust" },
-      high: { pl: "Oddanie", en: "Admiration" }
-    },
     vector: { pl: "DO SIEBIE / WCHŁANIANIE", en: "TOWARD SELF / ABSORPTION" },
-    signals: {
-      pl: [
-        "Stały, łagodny kontakt wzrokowy",
-        "Odsłonięcie wrażliwych części ciała (szyja, brzuch)",
-        "Otwarte dłonie (pokazywanie wnętrza)",
-        "Pochylenie ciała w stronę rozmówcy",
-        "Synchronizacja ruchów (efekt lustra)",
-        "Rozluźnione mięśnie twarzy (brak napięcia)",
-        "Spokojny, miarowy oddech",
-        "Ciepły, kojący ton głosu"
-      ],
-      en: [
-        "Steady, gentle eye contact",
-        "Exposing vulnerable body parts (neck, belly)",
-        "Open hands (showing palms)",
-        "Leaning body towards the interlocutor",
-        "Synchronization of movements (mirror effect)",
-        "Relaxed facial muscles (no tension)",
-        "Calm, measured breathing",
-        "Warm, soothing voice tone"
-      ]
-    },
     colorClass: "text-lime-500",
     bgLightClass: "bg-lime-500/10",
     hex: "#84cc16",
     icon: UserCheck,
+    actorGuide: {
+      body: {
+        pl: "Przód ciała mięknie. Brzuch, klatka piersiowa, gardło — te miejsca, które zwykle chronisz, odpuszczają osłonę. Poczuj, że jesteś lekko nachylony do przodu — nie dlatego, że się pochylasz, ale dlatego, że coś przed tobą jest warte zbliżenia się. Stopy są stabilne. Ziemia trzyma.",
+        en: "The front of the body softens. Belly, chest, throat — those places you usually protect, drop their guard. Feel that you are leaning slightly forward — not because you are bending, but because something in front of you is worth getting closer to. Feet are stable. The ground holds you."
+      },
+      attention: {
+        pl: "Uwaga jest spokojna i skoncentrowana — ale nie czujna. Nie skanujesz zagrożeń. Patrzysz na to, co przed tobą, z taką jakością uwagi, z jaką patrzysz na kogoś, kto śpi i komu ufasz. Nie musisz śledzić — możesz po prostu być z.",
+        en: "Attention is calm and focused — but not vigilant. You are not scanning for threats. You look at what's in front of you with the quality of attention you use when looking at someone sleeping whom you trust. You don't have to track — you can just be with."
+      },
+      internal: {
+        pl: "Poczuj, że masz ciężar — ale to jest dobry ciężar. Ciężar kogoś, kto wie, gdzie stoi. Wewnątrz jest coś solidnego, cichego, stabilnego. Jakbyś miał w środku coś, co nie musi się bronić, bo wie, że jest bezpieczne.",
+        en: "Feel that you have weight — but it's a good weight. The weight of someone who knows where they stand. Inside there is something solid, quiet, stable. As if you had something inside that doesn't need to defend itself, because it knows it's safe."
+      },
+      breath: {
+        pl: "Wolny. Głęboki. Brzuszny. Oddech kogoś, kto nie musi się spieszyć.",
+        en: "Slow. Deep. Abdominal. The breath of someone who doesn't have to rush."
+      }
+    }
   },
   {
     id: "FEAR",
     name: { pl: "Strach", en: "Fear" },
     desc: {
-      pl: "Ciało rozpoznaje siłę wyższą od siebie. Priorytetem jest zachowanie integralności poprzez wycofanie.",
-      en: "The body recognizes a force greater than itself. Priority is to preserve integrity by withdrawing.",
+      pl: "Ciało rozpoznaje siłę wyższą od siebie. Priorytetem jest przetrwanie poprzez wycofanie.",
+      en: "The body recognizes a force greater than itself. Priority is survival by withdrawing.",
     },
-    stimulus: { pl: "ZAGROŻENIE", en: "THREAT" },
     impulse: { pl: "Napięcie / Alarm", en: "Tension / Alarm" },
     action: { pl: "UCIECZKA / UNIK", en: "ESCAPE / AVOIDANCE" },
     function: { pl: "OCHRONA", en: "PROTECTION" },
-    intensity: {
-      low: { pl: "Niepokój", en: "Anxiety" },
-      medium: { pl: "Strach", en: "Fear" },
-      high: { pl: "Przerażenie", en: "Terror" }
-    },
     vector: { pl: "DO TYŁU / KURCZENIE SIĘ", en: "BACKWARD / CONTRACTION" },
-    signals: {
-      pl: [
-        "Przyspieszone bicie serca (kołatanie)",
-        "Płytki, szybki oddech lub wstrzymywanie powietrza",
-        "Bladość twarzy, odpływ krwi z kończyn",
-        "Zimny pot (szczególnie na czole i dłoniach)",
-        "Drżenie rąk, kolan lub warg",
-        "Szeroko otwarte oczy, rozszerzone źrenice",
-        "Suchość w ustach (częste przełykanie śliny)",
-        "Odruchowe kulenie się (osłanianie szyi/brzucha)"
-      ],
-      en: [
-        "Accelerated heartbeat (palpitations)",
-        "Shallow, rapid breathing or holding breath",
-        "Pale face, blood draining from limbs",
-        "Cold sweat (especially on forehead and palms)",
-        "Trembling hands, knees or lips",
-        "Wide open eyes, dilated pupils",
-        "Dry mouth (frequent swallowing)",
-        "Reflexive crouching (shielding neck/belly)"
-      ]
-    },
     colorClass: "text-emerald-500",
     bgLightClass: "bg-emerald-500/10",
     hex: "#10b981",
     icon: AlertTriangle,
+    actorGuide: {
+      body: {
+        pl: "Ciężar przenosi się do góry — z brzucha do klatki, z klatki do ramion, z ramion do głowy. Stopy tracą kontakt z podłogą — nie fizycznie, ale jakościowo. Jakbyś mógł potrzebować uciec i ciało się już szykuje. Wszystko się lekko zacieśnia, kurczy. Nie zamykasz się — zbierasz się. Ciało chce być mniejsze, szybsze, gotowe.",
+        en: "Weight moves up — from the belly to the chest, from the chest to the shoulders, from the shoulders to the head. Feet lose contact with the floor — not physically, but qualitatively. As if you might need to run and the body is already preparing. Everything slightly tightens, shrinks. You don't close yourself — you gather yourself. The body wants to be smaller, faster, ready."
+      },
+      attention: {
+        pl: "Widzenie peryferykiem nagle staje się bardzo aktywne. Szukasz. Nie wiesz czego — ale coś jest na granicy pola widzenia i jeszcze się nie ujawniło. Wzrok jest ostry, skacze. Uszy słyszą więcej niż zwykle.",
+        en: "Peripheral vision suddenly becomes very active. You are searching. You don't know for what — but something is on the edge of your field of vision and hasn't revealed itself yet. The gaze is sharp, jumping. Ears hear more than usual."
+      },
+      internal: {
+        pl: "Jest coś, co nadchodzi, ale nie wiesz co. Jeszcze nie. Gdzieś w żołądku lub w klatce pojawia się chłód, napięcie, elektryczność. Nie ból — napięcie czegoś, co czeka na informację, której jeszcze nie ma.",
+        en: "There is something coming, but you don't know what. Not yet. Somewhere in the stomach or chest there is a coldness, tension, electricity. Not pain — the tension of something waiting for information that isn't there yet."
+      },
+      breath: {
+        pl: "Płytki, wysoko w klatce. Albo wstrzymany — jakbyś nasłuchiwał i oddech by ci przeszkadzał.",
+        en: "Shallow, high in the chest. Or held — as if you were listening and the breath would interfere."
+      }
+    }
   },
   {
     id: "SURPRISE",
@@ -256,86 +206,66 @@ const EMOTIONS: Emotion[] = [
       pl: "Nagły reset uwagi ('Biała karta'). Przerwanie działania, by ocenić nowy bodziec.",
       en: "Sudden reset of attention ('Blank slate'). Interrupting action to assess a new stimulus.",
     },
-    stimulus: { pl: "NAGŁY OBIEKT", en: "SUDDEN OBJECT" },
     impulse: { pl: "Wdech / Zatrzymanie", en: "Inhale / Freezing" },
     action: { pl: "STOP / RESET", en: "STOP / RESET" },
     function: { pl: "ORIENTACJA", en: "ORIENTATION" },
-    intensity: {
-      low: { pl: "Roztargnienie", en: "Distraction" },
-      medium: { pl: "Zaskoczenie", en: "Surprise" },
-      high: { pl: "Szok", en: "Amazement" }
-    },
     vector: { pl: "STOP / ROZSZERZENIE", en: "STOP / EXPANSION" },
-    signals: {
-      pl: [
-        "Gwałtowne otwarcie ust (opadnięcie żuchwy)",
-        "Wysoko uniesione brwi (zmarszczki na czole)",
-        "Szeroko otwarte oczy (widoczne białka)",
-        "Nagły, krótki wdech (gasp)",
-        "Chwilowe zamarcie w bezruchu (reakcja 'freeze')",
-        "Odruchowe cofnięcie się (krok w tył)",
-        "Podniesienie dłoni do ust lub klatki piersiowej",
-        "Rozluźnienie mięśni po chwili (jeśli brak zagrożenia)"
-      ],
-      en: [
-        "Sudden opening of mouth (jaw drop)",
-        "High raised eyebrows (wrinkles on forehead)",
-        "Wide open eyes (visible whites)",
-        "Sudden, short inhale (gasp)",
-        "Momentary freezing in stillness ('freeze' reaction)",
-        "Reflexive stepping back",
-        "Raising hands to mouth or chest",
-        "Relaxation of muscles after a moment (if no threat)"
-      ]
-    },
     colorClass: "text-cyan-500",
     bgLightClass: "bg-cyan-500/10",
     hex: "#06b6d4",
     icon: Maximize2,
+    actorGuide: {
+      body: {
+        pl: "Nagłe zatrzymanie. Coś, co robiłeś — jakikolwiek ruch, jakikolwiek plan — nagle zostaje przerwane. Ciało się otwiera gwałtownie: oczy szerzej, klatka szerzej, ręce lekko od tułowia. Jakbyś nagle musiał pomieścić więcej niż przed chwilą. Poczuj ten moment powiększenia.",
+        en: "Sudden stop. Whatever you were doing — any movement, any plan — is suddenly interrupted. The body opens violently: eyes wider, chest wider, arms slightly away from the torso. As if you suddenly had to accommodate more than a moment ago. Feel this moment of enlargement."
+      },
+      attention: {
+        pl: "Rama, przez którą patrzyłeś na świat, właśnie pękła. Wszystko jest nowe. Uwaga jest całkowicie otwarta, pusta, receptywna — nie szuka jeszcze, bo nie wie, czego szukać. To jest czysty odbiór, przed interpretacją. Dziecko widzi tak, kiedy widzi coś pierwszy raz.",
+        en: "The frame through which you looked at the world just broke. Everything is new. Attention is completely open, empty, receptive — not searching yet, because it doesn't know what to look for. This is pure reception, before interpretation. A child sees like this when seeing something for the first time."
+      },
+      internal: {
+        pl: "W środku jest chwilowa pustka — ale nie straszna. Jasna pustka. Jak flash aparatu — wszystko bieleje na sekundę, a potem świat wraca, ale inny. Między starą ramą a nową jest moment, w którym nie masz żadnej ramy. Zostań w tym momencie.",
+        en: "Inside there is a momentary emptiness — but not scary. A bright emptiness. Like a camera flash — everything turns white for a second, and then the world returns, but different. Between the old frame and the new one is a moment where you have no frame. Stay in this moment."
+      },
+      breath: {
+        pl: "Gwałtowny, krótki wdech. A potem pauza. Ciało czeka, co będzie dalej.",
+        en: "Sudden, short inhale. And then a pause. The body waits for what's next."
+      }
+    }
   },
   {
     id: "SADNESS",
     name: { pl: "Smutek", en: "Sadness" },
     desc: {
-      pl: "Sygnał dla grupy o potrzebie wsparcia ('Pomóż mi'). Oszczędzanie energii w obliczu nieodwracalnej straty.",
-      en: "Signal to the group for support ('Help me'). Conserving energy in the face of irreversible loss.",
+      pl: "Oszczędzanie energii w obliczu straty i naturalny sygnał dla grupy o potrzebie wsparcia.",
+      en: "Conserving energy in the face of loss and a natural signal to the group for support.",
     },
-    stimulus: { pl: "UTRATA", en: "LOSS" },
     impulse: { pl: "Ciężar / Zapadanie", en: "Heaviness / Sinking" },
     action: { pl: "PŁACZ / BEZRUCH", en: "CRYING / STILLNESS" },
     function: { pl: "REINTEGRACJA", en: "REINTEGRATION" },
-    intensity: {
-      low: { pl: "Zaduma", en: "Pensiveness" },
-      medium: { pl: "Smutek", en: "Sadness" },
-      high: { pl: "Rozpacz", en: "Grief" }
-    },
     vector: { pl: "W DÓŁ / DO ŚRODKA", en: "DOWNWARD / INWARD" },
-    signals: {
-      pl: [
-        "Opadające kąciki ust i powiek",
-        "Wzrok wbity w ziemię lub 'nieobecny'",
-        "Zgarbiona sylwetka, zapadnięta klatka piersiowa",
-        "Powolne, ociężałe ruchy (letarg)",
-        "Cichy, monotonny lub łamiący się głos",
-        "Łzy, szklące się oczy",
-        "Zasłanianie twarzy dłońmi",
-        "Apatia, brak reakcji na bodźce zewnętrzne"
-      ],
-      en: [
-        "Drooping corners of mouth and eyelids",
-        "Gaze fixed on the ground or 'absent'",
-        "Slumped silhouette, sunken chest",
-        "Slow, heavy movements (lethargy)",
-        "Quiet, monotone or breaking voice",
-        "Tears, glassy eyes",
-        "Covering face with hands",
-        "Apathy, lack of reaction to external stimuli"
-      ]
-    },
     colorClass: "text-blue-500",
     bgLightClass: "bg-blue-500/10",
     hex: "#3b82f6",
     icon: Anchor,
+    actorGuide: {
+      body: {
+        pl: "Ciężar wraca. Ale nie taki jak w zaufaniu — tamten był stabilny. Ten ciągnie w dół. Ramiona opadają, głowa ciężeje, klatka się zamyka — nie jako obrona, lecz jako wycofanie. Ciało traci zainteresowanie przestrzenią. Nie chcesz zajmować miejsca. Nie dlatego, że się boisz — dlatego, że nie ma po co.",
+        en: "The weight returns. But not like in trust — that was stable. This pulls down. Shoulders drop, head gets heavy, chest closes — not as a defense, but as a withdrawal. The body loses interest in space. You don't want to take up space. Not because you're afraid — because there's no point."
+      },
+      attention: {
+        pl: "Pole widzenia się zwęża. Obrzeża pokoju tracą znaczenie, rozmywają się. Wzrok opada — ku dołowi, ku podłodze, ku dłoniom. Albo wzrok staje się wewnętrzny — patrzysz, ale nie widzisz tego, co jest przed tobą. Widzisz coś, czego tu nie ma.",
+        en: "Field of vision narrows. The edges of the room lose meaning, blur. The gaze drops — downwards, towards the floor, towards the hands. Or the gaze becomes internal — you look, but you don't see what's in front of you. You see something that isn't here."
+      },
+      internal: {
+        pl: "Coś odeszło. Albo odchodzi. W środku klatki piersiowej jest ciężar, który nie jest fizyczny — jest to ciężar nieobecności. Jakby coś, co było pełne, stało się puste, i ta pustka ma wagę. Wszystko lekko zwalnia. Czas staje się gęsty.",
+        en: "Something is gone. Or is leaving. Inside the chest there is a weight that is not physical — it is the weight of absence. As if something that was full became empty, and this emptiness has weight. Everything slows down slightly. Time becomes thick."
+      },
+      breath: {
+        pl: "Wolny, ale płytki. Wdechy są niechętne, jakby ciało nie chciało napełniać się powietrzem. Wydechy długie, westchnięcia.",
+        en: "Slow, but shallow. Inhales are reluctant, as if the body doesn't want to fill with air. Exhales long, sighs."
+      }
+    }
   },
   {
     id: "DISGUST",
@@ -344,86 +274,66 @@ const EMOTIONS: Emotion[] = [
       pl: "Ochrona organizmu przed zatruciem fizycznym (jedzenie) lub moralnym (zachowanie).",
       en: "Protection of the organism against physical poisoning (food) or moral poisoning (behavior).",
     },
-    stimulus: { pl: "TOKSYNA", en: "TOXIN" },
     impulse: { pl: "Mdłości / Skurcz", en: "Nausea / Contraction" },
     action: { pl: "WYPYCHANIE / PLUCIE", en: "PUSHING AWAY / SPITTING" },
     function: { pl: "ODRZUCENIE", en: "REJECTION" },
-    intensity: {
-      low: { pl: "Niechęć", en: "Boredom" },
-      medium: { pl: "Wstręt", en: "Disgust" },
-      high: { pl: "Odraza", en: "Loathing" }
-    },
     vector: { pl: "OD SIEBIE / BLOKADA", en: "AWAY FROM SELF / BLOCKING" },
-    signals: {
-      pl: [
-        "Marszczenie nosa",
-        "Uniesienie górnej wargi (grymas)",
-        "Mrużenie oczu (ograniczenie pola widzenia)",
-        "Odwracanie głowy od źródła bodźca",
-        "Zasłanianie ust lub nosa dłonią",
-        "Odruch wymiotny, przełykanie śliny",
-        "Cofanie tułowia (odchylenie w tył)",
-        "Zaciskanie ust (blokada przed wniknięciem)"
-      ],
-      en: [
-        "Wrinkling nose",
-        "Raising upper lip (sneer)",
-        "Squinting eyes (limiting field of vision)",
-        "Turning head away from stimulus source",
-        "Covering mouth or nose with hand",
-        "Gag reflex, swallowing saliva",
-        "Retracting torso (leaning back)",
-        "Purging lips (blocking entry)"
-      ]
-    },
     colorClass: "text-purple-500",
     bgLightClass: "bg-purple-500/10",
     hex: "#a855f7",
     icon: MinusCircle,
+    actorGuide: {
+      body: {
+        pl: "Ciało odwraca się od. Nie do tyłu — od. Nos, górna warga, twarz odwracają się pierwsze. Potem ramiona. Potem tułów. To jest gest granicy: coś przekroczyło próg tego, co mogę przyjąć, i ciało to wypycha. Poczuj, że twoja skóra staje się barierą — nie chce przepuścić.",
+        en: "The body turns away from. Not backwards — away from. Nose, upper lip, face turn first. Then shoulders. Then torso. This is a gesture of boundary: something has crossed the threshold of what I can accept, and the body pushes it out. Feel that your skin becomes a barrier — it doesn't want to let it through."
+      },
+      attention: {
+        pl: "Paradoksalnie ostra — widzisz bardzo dokładnie to, od czego się odwracasz. Wzrok jest skupiony na źródle, ale z jakością „za dużo, za blisko”. A potem odwraca się. Nie chcesz tego widzieć, ale nie możesz nie widzieć.",
+        en: "Paradoxically sharp — you see very clearly what you are turning away from. The gaze is focused on the source, but with a quality of 'too much, too close'. And then it turns away. You don't want to see it, but you can't not see it."
+      },
+      internal: {
+        pl: "Coś jest nie tak. Nie niebezpieczne jak w strachu — złe. Skażone. Wewnątrz jest ruch wypychania — z żołądka, z gardła. Jakby ciało chciało wyrzucić coś, co się do niego dostało. Granica między mną a nie-mną staje się bardzo ostra, twarda.",
+        en: "Something is wrong. Not dangerous like in fear — bad. Contaminated. Inside there is a pushing movement — from the stomach, from the throat. As if the body wanted to throw out something that got into it. The boundary between me and not-me becomes very sharp, hard."
+      },
+      breath: {
+        pl: "Wydech dominuje. Silny, przez nos. Ciało chce pozbyć się powietrza, które było blisko tego źródła. Wdech jest niechętny — nie chcę wpuszczać.",
+        en: "Exhale dominates. Strong, through the nose. The body wants to get rid of the air that was near this source. Inhale is reluctant — I don't want to let it in."
+      }
+    }
   },
   {
     id: "ANGER",
     name: { pl: "Gniew", en: "Anger" },
     desc: {
-      pl: "Organizm rozpoznaje przeszkodę, którą może pokonać. Mobilizacja energii do walki.",
-      en: "The organism recognizes an obstacle it can overcome. Mobilization of energy to fight.",
+      pl: "Organizm rozpoznaje przeszkodę, którą może pokonać. Szybka mobilizacja energii do walki.",
+      en: "The organism recognizes an obstacle it can overcome. Rapid mobilization of energy to fight.",
     },
-    stimulus: { pl: "PRZESZKODA", en: "OBSTACLE" },
     impulse: { pl: "Gorąco / Adrenalina", en: "Heat / Adrenaline" },
     action: { pl: "ATAK / PRZEBICIE", en: "ATTACK / BREAKTHROUGH" },
     function: { pl: "DESTRUKCJA", en: "DESTRUCTION" },
-    intensity: {
-      low: { pl: "Irytacja", en: "Annoyance" },
-      medium: { pl: "Gniew", en: "Anger" },
-      high: { pl: "Wściekłość", en: "Rage" }
-    },
     vector: { pl: "DO PRZODU / TARCIE", en: "FORWARD / FRICTION" },
-    signals: {
-      pl: [
-        "Zaciśnięte szczęki, zgrzytanie zębami",
-        "Czerwienienie się twarzy i szyi",
-        "Rozdęte nozdrza",
-        "Zaciśnięte pięści (bielenie knykci)",
-        "Wysunięcie żuchwy lub głowy do przodu",
-        "Napięcie mięśni ramion i karku",
-        "Głośniejszy, szorstki ton głosu",
-        "Intensywny kontakt wzrokowy (tunelowe widzenie)"
-      ],
-      en: [
-        "Clenched jaws, grinding teeth",
-        "Reddening of face and neck",
-        "Flaring nostrils",
-        "Clenched fists (whitening knuckles)",
-        "Jutting jaw or head forward",
-        "Tension in shoulder and neck muscles",
-        "Louder, harsh voice tone",
-        "Intense eye contact (tunnel vision)"
-      ]
-    },
     colorClass: "text-red-500",
     bgLightClass: "bg-red-500/10",
     hex: "#ef4444",
     icon: Flame,
+    actorGuide: {
+      body: {
+        pl: "Energia idzie do przodu. Klatka piersiowa pręży się, szczęka się zaciska, ręce mają energię — nie do uderzenia (to jest za daleko), ale do trzymania, chwytania, ustalania. Ciało zajmuje więcej przestrzeni, ale inaczej niż w radości — radość rozszerza się we wszystkie strony, gniew rozszerza się ku. Jest cel. Może jeszcze nie wiesz jaki — ale ciało już wie, w którym kierunku.",
+        en: "Energy goes forward. Chest puffs out, jaw clenches, hands have energy — not to hit (that's too far), but to hold, grab, set. The body takes up more space, but differently than in joy — joy expands in all directions, anger expands towards. There is a target. Maybe you don't know what yet — but the body already knows in which direction."
+      },
+      attention: {
+        pl: "Bardzo wąska, bardzo ostra. Laserowa. Wszystko poza obiektem gniewu traci ostrość, staje się nieistotne. Widzisz jedno — i widzisz to z przenikliwością, z którą normalnie nie patrzysz. Gniew jest jak reflektor: oświetla z brutalną jasnością to, na co jest skierowany, i pogrąża w ciemności resztę.",
+        en: "Very narrow, very sharp. Laser-like. Everything outside the object of anger loses focus, becomes irrelevant. You see one thing — and you see it with a piercing quality with which you normally don't look. Anger is like a spotlight: it illuminates with brutal brightness what it is aimed at, and plunges the rest into darkness."
+      },
+      internal: {
+        pl: "Ciepło, ale inne niż w radości. Gorąco. Ciśnienie. Coś w środku rośnie i szuka ujścia. Granica została naruszona — i ciało to wie, zanim umysł zrozumie dlaczego. Jest poczucie „nie” — głębokie, cielesne, niepodważalne. Nie „nie chcę” — „NIE”.",
+        en: "Warmth, but different than in joy. Hot. Pressure. Something inside grows and seeks an outlet. A boundary has been breached — and the body knows it before the mind understands why. There is a feeling of 'no' — deep, bodily, undeniable. Not 'I don't want to' — 'NO'."
+      },
+      breath: {
+        pl: "Mocny, przez nos, z widocznym wysiłkiem. Jakby powietrze nie chciało się wpuścić wystarczająco szybko. Nozdrzowe.",
+        en: "Strong, through the nose, with visible effort. As if the air didn't want to let itself in fast enough. Nostril-focused."
+      }
+    }
   },
   {
     id: "ANTICIPATION",
@@ -432,42 +342,32 @@ const EMOTIONS: Emotion[] = [
       pl: "Aktywne poszukiwanie informacji. Przygotowanie ciała na to, co dopiero nadejdzie.",
       en: "Active search for information. Preparing the body for what is yet to come.",
     },
-    stimulus: { pl: "NIEZNANE TERYTORIUM", en: "UNKNOWN TERRITORY" },
     impulse: { pl: "Wyostrzenie zmysłów", en: "Sharpening of senses" },
     action: { pl: "SKANOWANIE / TROPIENIE", en: "SCANNING / TRACKING" },
     function: { pl: "EKSPLORACJA", en: "EXPLORATION" },
-    intensity: {
-      low: { pl: "Ciekawość", en: "Interest" },
-      medium: { pl: "Oczekiwanie", en: "Anticipation" },
-      high: { pl: "Czujność", en: "Vigilance" }
-    },
     vector: { pl: "DO PRZODU (Głowa)", en: "FORWARD (Head)" },
-    signals: {
-      pl: [
-        "Rozszerzone źrenice (chęć chłonięcia informacji)",
-        "Lekkie napięcie mięśni (gotowość do startu)",
-        "Oblizywanie ust (z niepokoju lub ekscytacji)",
-        "Wiercenie się, tupanie, bębnienie palcami",
-        "Wpatrywanie się w jeden punkt (np. drzwi, telefon)",
-        "Pochylenie głowy lub tułowia do przodu",
-        "Wstrzymywanie oddechu w kluczowych momentach",
-        "Skanowanie otoczenia wzrokiem"
-      ],
-      en: [
-        "Dilated pupils (desire to absorb information)",
-        "Slight muscle tension (readiness to start)",
-        "Licking lips (from anxiety or excitement)",
-        "Fidgeting, tapping, drumming fingers",
-        "Staring at one point (e.g., door, phone)",
-        "Leaning head or torso forward",
-        "Holding breath at key moments",
-        "Scanning the environment with eyes"
-      ]
-    },
     colorClass: "text-orange-500",
     bgLightClass: "bg-orange-500/10",
     hex: "#f97316",
     icon: EyeIcon,
+    actorGuide: {
+      body: {
+        pl: "Ciężar przenosi się na przodostopy. Ciało pochyla się lekko do przodu — nie ku czemuś konkretnemu, ale ku temu, co będzie. Jest gotowość, sprężystość. Nie napięcie strachu — raczej napięcie łucznika, który naciągnął cięciwę i jeszcze nie puścił. Ciało jest zorganizowane, czujne, zestrzelone.",
+        en: "Weight shifts to the balls of the feet. The body leans slightly forward — not towards something specific, but towards what will be. There is readiness, elasticity. Not the tension of fear — rather the tension of an archer who has drawn the bowstring and hasn't let go yet. The body is organized, alert, aligned."
+      },
+      attention: {
+        pl: "Skanowanie. Oczy są aktywne, ale nie niespokojne — szukają z przyjemnością. Uwaga jest zorientowana na przyszłość: nie na to, co jest, ale na to, co zaraz się pojawi. Jest to jakość uwagi myśliwego, który widzi ślady i odczytuje kierunek.",
+        en: "Scanning. Eyes are active, but not anxious — they search with pleasure. Attention is oriented towards the future: not on what is, but on what is about to appear. It's the quality of attention of a hunter seeing tracks and reading the direction."
+      },
+      internal: {
+        pl: "Coś się zbliża. Jeszcze nie wiesz co — ale poruszasz się w jego stronę. W środku jest coś cienistego, lekkiego, naładowanego. Nie niepokój — elektryczność. Jakby powietrze przed burzą: nic się jeszcze nie dzieje, ale wszystko jest naładowane tym, że zaraz się wydarzy.",
+        en: "Something is approaching. You don't know what yet — but you move towards it. Inside there is something shadowy, light, charged. Not anxiety — electricity. Like the air before a storm: nothing is happening yet, but everything is charged with the fact that it's about to happen."
+      },
+      breath: {
+        pl: "Lekko wstrzymany. Nie z lęku — z gotowości. Oddech kogoś, kto nasłuchuje, kiedy usłyszy sygnał.",
+        en: "Slightly held. Not out of fear — out of readiness. The breath of someone listening for a signal."
+      }
+    }
   },
 ]
 
@@ -511,82 +411,6 @@ const getDyad = (e1Id: string, e2Id: string): DyadResult | null => {
     "ANTICIPATION+SURPRISE": { name: { pl: "Konflikt", en: "Conflict" }, type: "opposite" },
   }
   return dyads[pair] || null
-}
-
-// ─── Sub-components ───────────────────────────────────────────────
-
-const EvoChain = ({ emotion, lang, isDark }: { emotion: Emotion, lang: 'pl'|'en', isDark: boolean }) => {
-  const t = uiTranslations[lang].modal
-  return (
-    <div className={`flex flex-col md:flex-row items-center justify-between gap-3 p-4 rounded-xl border mb-6 ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
-        <div className="text-center flex-1">
-            <span className="text-[10px] uppercase tracking-widest opacity-60 font-bold">{t.stimulus}</span>
-            <p className="font-bold text-sm mt-1">{emotion.stimulus[lang]}</p>
-        </div>
-        <ArrowRight className="hidden md:block opacity-40 w-5 h-5" />
-        <ArrowDown className="md:hidden opacity-40 w-5 h-5" />
-        
-        <div className={`text-center flex-1 p-2 rounded-lg border ${isDark ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200"}`}>
-            <span className={`text-[10px] uppercase tracking-widest font-bold ${isDark ? 'text-teal-400' : 'text-teal-600'}`}>{t.impulse}</span>
-            <p className="italic text-sm mt-1 font-serif">"{emotion.impulse[lang]}"</p>
-        </div>
-        <ArrowRight className="hidden md:block opacity-40 w-5 h-5" />
-        <ArrowDown className="md:hidden opacity-40 w-5 h-5" />
-
-        <div className={`text-center flex-1 p-3 rounded-xl border border-current ${emotion.bgLightClass} ${emotion.colorClass}`}>
-            <span className="text-[10px] uppercase tracking-widest opacity-70 font-bold">{t.emotion}</span>
-            <p className="font-black text-lg leading-tight mt-0.5">{emotion.name[lang]}</p>
-        </div>
-        <ArrowRight className="hidden md:block opacity-40 w-5 h-5" />
-        <ArrowDown className="md:hidden opacity-40 w-5 h-5" />
-
-        <div className="text-center flex-1">
-            <span className="text-[10px] uppercase tracking-widest opacity-60 font-bold">{t.action}</span>
-            <p className="font-bold text-sm mt-1">{emotion.action[lang]}</p>
-        </div>
-        <ArrowRight className="hidden md:block opacity-40 w-5 h-5" />
-        <ArrowDown className="md:hidden opacity-40 w-5 h-5" />
-
-        <div className={`text-center flex-1 p-2 rounded-lg ${isDark ? "bg-slate-900" : "bg-slate-100"}`}>
-            <span className="text-[9px] uppercase tracking-widest opacity-60 font-bold">{t.bioGoal}</span>
-            <p className={`font-bold text-xs mt-1 ${isDark ? 'text-teal-400' : 'text-teal-600'}`}>{emotion.function[lang]}</p>
-        </div>
-    </div>
-  )
-}
-
-const IntensityLadder = ({ emotion, lang, isDark }: { emotion: Emotion, lang: 'pl'|'en', isDark: boolean }) => {
-  const t = uiTranslations[lang].modal
-  return (
-    <div className={`p-5 rounded-xl border relative overflow-hidden ${isDark ? "bg-slate-900 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
-        <h3 className="text-xs font-bold uppercase tracking-widest opacity-60 mb-5 flex items-center gap-2">
-            <BarChart2 size={16} /> {t.energyScale}
-        </h3>
-        <div className="space-y-4 relative z-10">
-            <div className="flex items-center justify-between">
-                <span className="text-xs opacity-60 w-24 font-medium">{t.affect}</span>
-                <div className={`flex-1 mx-3 h-2 rounded-full overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
-                    <div className={`h-full w-full opacity-100 bg-current ${emotion.colorClass}`}></div>
-                </div>
-                <span className="text-sm font-bold w-32 text-right">{emotion.intensity.high[lang]}</span>
-            </div>
-            <div className="flex items-center justify-between">
-                <span className="text-xs opacity-60 w-24 font-medium">{t.emotion}</span>
-                <div className={`flex-1 mx-3 h-2 rounded-full overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
-                    <div className={`h-full w-2/3 opacity-70 bg-current ${emotion.colorClass}`}></div>
-                </div>
-                <span className="text-sm font-semibold w-32 text-right">{emotion.intensity.medium[lang]}</span>
-            </div>
-            <div className="flex items-center justify-between">
-                <span className="text-xs opacity-60 w-24 font-medium">{t.signal}</span>
-                <div className={`flex-1 mx-3 h-2 rounded-full overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
-                    <div className={`h-full w-1/3 opacity-40 bg-current ${emotion.colorClass}`}></div>
-                </div>
-                <span className="text-sm opacity-70 w-32 text-right">{emotion.intensity.low[lang]}</span>
-            </div>
-        </div>
-    </div>
-  )
 }
 
 // ─── App Component ────────────────────────────────────────────────
@@ -718,16 +542,21 @@ const App: React.FC = () => {
         {/* ─── SHUFFLE VIEW ─── */}
         {view === "shuffle" && (
           <div className="flex flex-col items-center w-full max-w-lg px-4 animate-fade" key="shuffle-view">
-            <div
-              className={`w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80 border-[8px] sm:border-[12px] rounded-full flex items-center justify-center p-10 sm:p-14 mb-6 sm:mb-8 transition-colors duration-500 relative overflow-hidden ${
+            <button
+              onClick={() => !isSpinning && setSelectedEmotion(currentEmotion)}
+              disabled={isSpinning}
+              className={`w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80 border-[8px] sm:border-[12px] rounded-full flex items-center justify-center p-10 sm:p-14 mb-2 transition-all duration-500 relative overflow-hidden ${
                 isDark
-                  ? "bg-slate-900 border-slate-800 shadow-2xl shadow-black"
-                  : "bg-white border-slate-100 shadow-2xl shadow-slate-300/50"
-              } ${currentEmotion.colorClass} ${isSpinning ? "animate-roulette" : ""}`}
+                  ? "bg-slate-900 border-slate-800 hover:border-slate-700 shadow-2xl shadow-black"
+                  : "bg-white border-slate-100 hover:border-slate-200 shadow-2xl shadow-slate-300/50"
+              } ${currentEmotion.colorClass} ${isSpinning ? "animate-roulette cursor-default" : "hover:scale-[1.02] active:scale-95 cursor-pointer"}`}
             >
               <div className="relative z-10 drop-shadow-md">
                 <currentEmotion.icon strokeWidth={1.5} className="w-24 h-24 sm:w-32 sm:h-32" />
               </div>
+            </button>
+            <div className={`text-[9px] sm:text-[10px] uppercase tracking-widest font-bold mb-6 sm:mb-8 transition-opacity duration-300 ${isSpinning ? 'opacity-0' : 'opacity-40'}`}>
+              {lang === 'pl' ? 'Kliknij okrąg, aby zobaczyć instrukcje' : 'Click the circle to view instructions'}
             </div>
 
             <div className="text-center mb-6 sm:mb-8 w-full transition-opacity duration-300" style={{ opacity: isSpinning ? 0 : 1 }}>
@@ -779,6 +608,12 @@ const App: React.FC = () => {
           const result = getDyad(dyadPair[0].id, dyadPair[1].id)
           const Icon1 = dyadPair[0].icon
           const Icon2 = dyadPair[1].icon
+          
+          // Ustawienie intensywnego cienia tekstu w zależności od motywu aby tekst był zawsze na wierzchu i czytelny
+          const textShadowStyle = isDark 
+            ? '0 2px 10px rgba(0,0,0,0.9), 0 0 5px rgba(0,0,0,0.8)' 
+            : '0 2px 10px rgba(255,255,255,1), 0 0 5px rgba(255,255,255,0.9)';
+
           return (
             <div className="w-full flex flex-col items-center animate-fade px-2">
               <div className="text-center mb-6 sm:mb-8 max-w-lg">
@@ -786,37 +621,40 @@ const App: React.FC = () => {
                 <p className="text-xs sm:text-sm opacity-60 leading-relaxed px-4">{t.dyadsDesc}</p>
               </div>
 
+              {/* Olympic Rings Effect */}
               <div className="flex justify-center items-center mb-8 sm:mb-12 relative h-40 sm:h-56 w-full max-w-[16rem] sm:max-w-sm mx-auto">
-                {/* Emotion 1 */}
+                {/* Emotion 1 Ring */}
                 <div
-                  className={`absolute left-0 w-40 h-40 sm:w-56 sm:h-56 rounded-full flex flex-col items-center justify-center p-4 shadow-xl border-4 sm:border-8 mix-blend-multiply dark:mix-blend-screen transition-all duration-500 ${
-                    isDark ? "border-slate-950 bg-slate-900" : "border-slate-50 bg-white"
-                  }`}
-                  style={{ zIndex: 2 }}
-                >
-                  <div className={`absolute inset-0 rounded-full opacity-60 ${dyadPair[0].bgLightClass}`} />
-                  <div className="relative z-10 flex flex-col items-center">
-                    <Icon1 className={`w-12 h-12 sm:w-16 sm:h-16 mb-2 sm:mb-3 ${dyadPair[0].colorClass}`} strokeWidth={1.5} />
-                    <h3 className={`text-sm sm:text-xl font-black uppercase tracking-tight text-center ${dyadPair[0].colorClass}`}>
-                      {dyadPair[0].name[lang]}
-                    </h3>
-                  </div>
+                  className="absolute left-0 w-40 h-40 sm:w-56 sm:h-56 rounded-full border-[6px] sm:border-[8px] opacity-80 transition-all duration-500 bg-transparent"
+                  style={{ borderColor: dyadPair[0].hex }}
+                />
+                
+                {/* Emotion 2 Ring */}
+                <div
+                  className="absolute right-0 w-40 h-40 sm:w-56 sm:h-56 rounded-full border-[6px] sm:border-[8px] opacity-80 transition-all duration-500 bg-transparent"
+                  style={{ borderColor: dyadPair[1].hex }}
+                />
+
+                {/* Emotion 1 Content (Top Layer) */}
+                <div className="absolute left-0 w-40 h-40 sm:w-56 sm:h-56 flex flex-col items-center justify-center p-4 z-10 pointer-events-none">
+                  <Icon1 className={`w-10 h-10 sm:w-14 sm:h-14 mb-1 sm:mb-2 ${dyadPair[0].colorClass}`} strokeWidth={2} style={{ filter: `drop-shadow(0 2px 4px ${isDark ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.8)'})` }} />
+                  <h3 
+                    className={`text-xs sm:text-lg font-black uppercase tracking-tight text-center ${dyadPair[0].colorClass}`}
+                    style={{ textShadow: textShadowStyle }}
+                  >
+                    {dyadPair[0].name[lang]}
+                  </h3>
                 </div>
 
-                {/* Emotion 2 */}
-                <div
-                  className={`absolute right-0 w-40 h-40 sm:w-56 sm:h-56 rounded-full flex flex-col items-center justify-center p-4 shadow-xl border-4 sm:border-8 mix-blend-multiply dark:mix-blend-screen transition-all duration-500 ${
-                    isDark ? "border-slate-950 bg-slate-900" : "border-slate-50 bg-white"
-                  }`}
-                  style={{ zIndex: 1 }}
-                >
-                  <div className={`absolute inset-0 rounded-full opacity-60 ${dyadPair[1].bgLightClass}`} />
-                  <div className="relative z-10 flex flex-col items-center">
-                    <Icon2 className={`w-12 h-12 sm:w-16 sm:h-16 mb-2 sm:mb-3 ${dyadPair[1].colorClass}`} strokeWidth={1.5} />
-                    <h3 className={`text-sm sm:text-xl font-black uppercase tracking-tight text-center ${dyadPair[1].colorClass}`}>
-                      {dyadPair[1].name[lang]}
-                    </h3>
-                  </div>
+                {/* Emotion 2 Content (Top Layer) */}
+                <div className="absolute right-0 w-40 h-40 sm:w-56 sm:h-56 flex flex-col items-center justify-center p-4 z-10 pointer-events-none">
+                  <Icon2 className={`w-10 h-10 sm:w-14 sm:h-14 mb-1 sm:mb-2 ${dyadPair[1].colorClass}`} strokeWidth={2} style={{ filter: `drop-shadow(0 2px 4px ${isDark ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.8)'})` }} />
+                  <h3 
+                    className={`text-xs sm:text-lg font-black uppercase tracking-tight text-center ${dyadPair[1].colorClass}`}
+                    style={{ textShadow: textShadowStyle }}
+                  >
+                    {dyadPair[1].name[lang]}
+                  </h3>
                 </div>
               </div>
 
@@ -982,7 +820,7 @@ const App: React.FC = () => {
 
       </main>
 
-      {/* ─── MODAL (Aktorskie Kompendium) ─── */}
+      {/* ─── MODAL (Aktorskie Kompendium - Nowy Format) ─── */}
       {selectedEmotion && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade" onClick={() => setSelectedEmotion(null)}>
           <div 
@@ -1008,68 +846,64 @@ const App: React.FC = () => {
               </button>
             </div>
 
-            {/* Treść Modala */}
-            <div className="p-6 sm:p-8 space-y-8">
-              <section>
-                <h3 className="text-xs font-bold uppercase tracking-widest opacity-60 mb-4">{t.modal.mechanism}</h3>
-                <EvoChain emotion={selectedEmotion} lang={lang} isDark={isDark} />
-                <p className="text-[10px] sm:text-xs opacity-50 text-center italic mt-2">{t.modal.neuroception}</p>
-              </section>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                  <IntensityLadder emotion={selectedEmotion} lang={lang} isDark={isDark} />
-                  
-                  <div className={`p-6 rounded-xl border ${isDark ? "bg-slate-900/50 border-slate-800" : "bg-white border-slate-200 shadow-sm"}`}>
-                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                        <Activity size={18} className="text-blue-500"/> {t.modal.motorics}
-                    </h3>
-                    <ul className="space-y-3 text-sm">
-                        <li className="flex gap-3 items-center">
-                            <ArrowRight size={16} className="text-blue-500" />
-                            <span>{t.modal.movementVector}: <strong className="uppercase">{selectedEmotion.vector[lang]}</strong></span>
-                        </li>
-                        <li className={`pt-3 border-t italic opacity-80 ${isDark ? "border-slate-800" : "border-slate-100"}`}>
-                          "{selectedEmotion.action[lang]}"
-                        </li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div className={`p-6 sm:p-8 rounded-xl border h-full ${isDark ? "bg-slate-900 border-slate-700" : "bg-white border-slate-200 shadow-md"}`}>
-                    <h3 className="text-lg font-bold flex items-center gap-2 mb-2">
-                        <Fingerprint size={20} className="text-teal-500" /> {t.modal.bodyDictionary}
-                    </h3>
-                    <p className="text-xs opacity-60 mb-6">{t.modal.bodyDictDesc}</p>
-                    <ul className="space-y-3">
-                        {selectedEmotion.signals[lang].map((signal, idx) => (
-                            <li key={idx} className="flex gap-3 text-sm items-start">
-                                <span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${selectedEmotion.colorClass.replace('text-', 'bg-')}`}></span>
-                                <span className="opacity-90">{signal}</span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+            {/* Treść Modala - Instrukcje Aktorskie */}
+            <div className="p-6 sm:p-8 space-y-6">
+              
+              {/* Note Banner */}
+              <div className={`p-4 rounded-2xl border flex gap-4 items-start ${isDark ? "bg-amber-500/10 border-amber-500/20 text-amber-200" : "bg-amber-50 border-amber-200 text-amber-800"}`}>
+                <Info size={20} className="shrink-0 mt-0.5 opacity-80" />
+                <p className="text-xs sm:text-sm font-medium leading-relaxed">
+                  {t.modal.introNote}
+                </p>
               </div>
 
-              {/* Perspektywa Aktora */}
-              <div className={`p-6 rounded-2xl border-2 border-dashed ${isDark ? "bg-slate-900/30 border-slate-700" : "bg-slate-50 border-slate-300"}`}>
-                  <h3 className="text-xs font-bold uppercase tracking-widest opacity-60 mb-4">{t.modal.actorPerspective}</h3>
-                  <div className="flex flex-col md:flex-row gap-6">
-                      <div className="flex-1">
-                          <span className="text-[10px] uppercase font-bold opacity-50 block mb-1">{t.modal.bodySignal}</span>
-                          <p className="text-lg font-serif italic font-medium">"{selectedEmotion.impulse[lang]}"</p>
-                      </div>
-                      <div className="flex-1">
-                          <span className="text-[10px] uppercase font-bold opacity-50 block mb-1">{t.modal.scenicGoal}</span>
-                          <p className="text-sm font-medium">{selectedEmotion.desc[lang]}</p>
-                      </div>
-                      <div className={`flex-1 md:pl-6 flex items-center md:border-l ${isDark ? 'border-slate-700' : 'border-slate-300'}`}>
-                          <p className="text-xs italic opacity-70">
-                              {t.modal.remember}
-                          </p>
-                      </div>
-                  </div>
+              {/* Grid 4 Aspektów */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                
+                {/* 1. Ciało-w-przestrzeni */}
+                <section className={`p-5 sm:p-6 rounded-2xl border ${isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200 shadow-sm"}`}>
+                  <h3 className={`flex items-center gap-2 font-bold uppercase tracking-widest text-xs sm:text-sm mb-4 ${selectedEmotion.colorClass}`}>
+                    <User size={18} />
+                    {t.modal.bodyInSpace}
+                  </h3>
+                  <p className="text-sm leading-relaxed opacity-90">
+                    {selectedEmotion.actorGuide.body[lang]}
+                  </p>
+                </section>
+
+                {/* 2. Jakość uwagi */}
+                <section className={`p-5 sm:p-6 rounded-2xl border ${isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200 shadow-sm"}`}>
+                  <h3 className={`flex items-center gap-2 font-bold uppercase tracking-widest text-xs sm:text-sm mb-4 ${selectedEmotion.colorClass}`}>
+                    <Focus size={18} />
+                    {t.modal.attentionQuality}
+                  </h3>
+                  <p className="text-sm leading-relaxed opacity-90">
+                    {selectedEmotion.actorGuide.attention[lang]}
+                  </p>
+                </section>
+
+                {/* 3. Wewnętrzny krajobraz */}
+                <section className={`p-5 sm:p-6 rounded-2xl border ${isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200 shadow-sm"}`}>
+                  <h3 className={`flex items-center gap-2 font-bold uppercase tracking-widest text-xs sm:text-sm mb-4 ${selectedEmotion.colorClass}`}>
+                    <Compass size={18} />
+                    {t.modal.internalLandscape}
+                  </h3>
+                  <p className="text-sm leading-relaxed opacity-90">
+                    {selectedEmotion.actorGuide.internal[lang]}
+                  </p>
+                </section>
+
+                {/* 4. Oddech */}
+                <section className={`p-5 sm:p-6 rounded-2xl border ${isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200 shadow-sm"}`}>
+                  <h3 className={`flex items-center gap-2 font-bold uppercase tracking-widest text-xs sm:text-sm mb-4 ${selectedEmotion.colorClass}`}>
+                    <Wind size={18} />
+                    {t.modal.breath}
+                  </h3>
+                  <p className="text-sm leading-relaxed opacity-90">
+                    {selectedEmotion.actorGuide.breath[lang]}
+                  </p>
+                </section>
+
               </div>
             </div>
           </div>
