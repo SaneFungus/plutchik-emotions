@@ -10,14 +10,14 @@ import {
   Layers,
   Activity,
   Target,
-  AlertTriangle,
+  TriangleAlert, // Zmienione z AlertTriangle
   Flame,
   Zap,
   Anchor,
   UserCheck,
-  MinusCircle,
+  CircleMinus,   // Zmienione z MinusCircle
   Eye as EyeIcon,
-  Maximize2,
+  Maximize,      // Zmienione z Maximize2
   Move,
   X,
   User,
@@ -179,7 +179,7 @@ const EMOTIONS: Emotion[] = [
     colorClass: "text-emerald-500",
     bgLightClass: "bg-emerald-500/10",
     hex: "#10b981",
-    icon: AlertTriangle,
+    icon: TriangleAlert, // Poprawione
     actorGuide: {
       body: {
         pl: "Ciężar przenosi się do góry — z brzucha do klatki, z klatki do ramion, z ramion do głowy. Stopy tracą kontakt z podłogą — nie fizycznie, ale jakościowo. Jakbyś mógł potrzebować uciec i ciało się już szykuje. Wszystko się lekko zacieśnia, kurczy. Nie zamykasz się — zbierasz się. Ciało chce być mniejsze, szybsze, gotowe.",
@@ -213,7 +213,7 @@ const EMOTIONS: Emotion[] = [
     colorClass: "text-cyan-500",
     bgLightClass: "bg-cyan-500/10",
     hex: "#06b6d4",
-    icon: Maximize2,
+    icon: Maximize, // Poprawione
     actorGuide: {
       body: {
         pl: "Nagłe zatrzymanie. Coś, co robiłeś — jakikolwiek ruch, jakikolwiek plan — nagle zostaje przerwane. Ciało się otwiera gwałtownie: oczy szerzej, klatka szerzej, ręce lekko od tułowia. Jakbyś nagle musiał pomieścić więcej niż przed chwilą. Poczuj ten moment powiększenia.",
@@ -281,7 +281,7 @@ const EMOTIONS: Emotion[] = [
     colorClass: "text-purple-500",
     bgLightClass: "bg-purple-500/10",
     hex: "#a855f7",
-    icon: MinusCircle,
+    icon: CircleMinus, // Poprawione
     actorGuide: {
       body: {
         pl: "Ciało odwraca się od. Nie do tyłu — od. Nos, górna warga, twarz odwracają się pierwsze. Potem ramiona. Potem tułów. To jest gest granicy: coś przekroczyło próg tego, co mogę przyjąć, i ciało to wypycha. Poczuj, że twoja skóra staje się barierą — nie chce przepuścić.",
@@ -609,7 +609,6 @@ const App: React.FC = () => {
           const Icon1 = dyadPair[0].icon
           const Icon2 = dyadPair[1].icon
           
-          // Ustawienie intensywnego cienia tekstu w zależności od motywu aby tekst był zawsze na wierzchu i czytelny
           const textShadowStyle = isDark 
             ? '0 2px 10px rgba(0,0,0,0.9), 0 0 5px rgba(0,0,0,0.8)' 
             : '0 2px 10px rgba(255,255,255,1), 0 0 5px rgba(255,255,255,0.9)';
@@ -621,21 +620,17 @@ const App: React.FC = () => {
                 <p className="text-xs sm:text-sm opacity-60 leading-relaxed px-4">{t.dyadsDesc}</p>
               </div>
 
-              {/* Olympic Rings Effect */}
               <div className="flex justify-center items-center mb-8 sm:mb-12 relative h-40 sm:h-56 w-full max-w-[16rem] sm:max-w-sm mx-auto">
-                {/* Emotion 1 Ring */}
                 <div
                   className="absolute left-0 w-40 h-40 sm:w-56 sm:h-56 rounded-full border-[6px] sm:border-[8px] opacity-80 transition-all duration-500 bg-transparent"
                   style={{ borderColor: dyadPair[0].hex }}
                 />
                 
-                {/* Emotion 2 Ring */}
                 <div
                   className="absolute right-0 w-40 h-40 sm:w-56 sm:h-56 rounded-full border-[6px] sm:border-[8px] opacity-80 transition-all duration-500 bg-transparent"
                   style={{ borderColor: dyadPair[1].hex }}
                 />
 
-                {/* Emotion 1 Content (Top Layer) */}
                 <div className="absolute left-0 w-40 h-40 sm:w-56 sm:h-56 flex flex-col items-center justify-center p-4 z-10 pointer-events-none">
                   <Icon1 className={`w-10 h-10 sm:w-14 sm:h-14 mb-1 sm:mb-2 ${dyadPair[0].colorClass}`} strokeWidth={2} style={{ filter: `drop-shadow(0 2px 4px ${isDark ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.8)'})` }} />
                   <h3 
@@ -646,7 +641,6 @@ const App: React.FC = () => {
                   </h3>
                 </div>
 
-                {/* Emotion 2 Content (Top Layer) */}
                 <div className="absolute right-0 w-40 h-40 sm:w-56 sm:h-56 flex flex-col items-center justify-center p-4 z-10 pointer-events-none">
                   <Icon2 className={`w-10 h-10 sm:w-14 sm:h-14 mb-1 sm:mb-2 ${dyadPair[1].colorClass}`} strokeWidth={2} style={{ filter: `drop-shadow(0 2px 4px ${isDark ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.8)'})` }} />
                   <h3 
