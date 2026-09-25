@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react"
+import React, { useState, useCallback, useEffect, useRef } from "react"
 import {
   Shuffle,
   Combine,
@@ -111,6 +111,7 @@ interface Emotion {
   vector: { pl: string; en: string }
   signals: { pl: string[]; en: string[] }
   colorClass: string
+  textLightClass: string
   bgLightClass: string
   hex: string
   icon: React.ElementType
@@ -157,6 +158,7 @@ const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-yellow-500",
+    textLightClass: "text-yellow-700",
     bgLightClass: "bg-yellow-500/10",
     hex: "#eab308",
     icon: Zap,
@@ -201,6 +203,7 @@ const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-lime-500",
+    textLightClass: "text-lime-700",
     bgLightClass: "bg-lime-500/10",
     hex: "#84cc16",
     icon: UserCheck,
@@ -245,6 +248,7 @@ const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-emerald-500",
+    textLightClass: "text-emerald-700",
     bgLightClass: "bg-emerald-500/10",
     hex: "#10b981",
     icon: AlertTriangle,
@@ -289,6 +293,7 @@ const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-cyan-500",
+    textLightClass: "text-cyan-700",
     bgLightClass: "bg-cyan-500/10",
     hex: "#06b6d4",
     icon: Maximize2,
@@ -333,6 +338,7 @@ const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-blue-500",
+    textLightClass: "text-blue-700",
     bgLightClass: "bg-blue-500/10",
     hex: "#3b82f6",
     icon: Anchor,
@@ -377,6 +383,7 @@ const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-purple-500",
+    textLightClass: "text-purple-700",
     bgLightClass: "bg-purple-500/10",
     hex: "#a855f7",
     icon: MinusCircle,
@@ -421,6 +428,7 @@ const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-red-500",
+    textLightClass: "text-red-700",
     bgLightClass: "bg-red-500/10",
     hex: "#ef4444",
     icon: Flame,
@@ -465,6 +473,7 @@ const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-orange-500",
+    textLightClass: "text-orange-700",
     bgLightClass: "bg-orange-500/10",
     hex: "#f97316",
     icon: EyeIcon,
@@ -520,35 +529,35 @@ const EvoChain = ({ emotion, lang, isDark }: { emotion: Emotion, lang: 'pl'|'en'
   return (
     <div className={`flex flex-col md:flex-row items-center justify-between gap-3 p-4 rounded-xl border mb-6 ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
         <div className="text-center flex-1">
-            <span className="text-[10px] uppercase tracking-widest opacity-60 font-bold">{t.stimulus}</span>
+            <span className="text-xs uppercase tracking-widest opacity-60 font-bold">{t.stimulus}</span>
             <p className="font-bold text-sm mt-1">{emotion.stimulus[lang]}</p>
         </div>
         <ArrowRight className="hidden md:block opacity-40 w-5 h-5" />
         <ArrowDown className="md:hidden opacity-40 w-5 h-5" />
         
         <div className={`text-center flex-1 p-2 rounded-lg border ${isDark ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200"}`}>
-            <span className={`text-[10px] uppercase tracking-widest font-bold ${isDark ? 'text-teal-400' : 'text-teal-600'}`}>{t.impulse}</span>
+            <span className={`text-xs uppercase tracking-widest font-bold ${isDark ? 'text-teal-400' : 'text-teal-600'}`}>{t.impulse}</span>
             <p className="italic text-sm mt-1 font-serif">"{emotion.impulse[lang]}"</p>
         </div>
         <ArrowRight className="hidden md:block opacity-40 w-5 h-5" />
         <ArrowDown className="md:hidden opacity-40 w-5 h-5" />
 
-        <div className={`text-center flex-1 p-3 rounded-xl border border-current ${emotion.bgLightClass} ${emotion.colorClass}`}>
-            <span className="text-[10px] uppercase tracking-widest opacity-70 font-bold">{t.emotion}</span>
+        <div className={`text-center flex-1 p-3 rounded-xl border border-current ${emotion.bgLightClass} ${isDark ? emotion.colorClass : emotion.textLightClass}`}>
+            <span className="text-xs uppercase tracking-widest opacity-70 font-bold">{t.emotion}</span>
             <p className="font-black text-lg leading-tight mt-0.5">{emotion.name[lang]}</p>
         </div>
         <ArrowRight className="hidden md:block opacity-40 w-5 h-5" />
         <ArrowDown className="md:hidden opacity-40 w-5 h-5" />
 
         <div className="text-center flex-1">
-            <span className="text-[10px] uppercase tracking-widest opacity-60 font-bold">{t.action}</span>
+            <span className="text-xs uppercase tracking-widest opacity-60 font-bold">{t.action}</span>
             <p className="font-bold text-sm mt-1">{emotion.action[lang]}</p>
         </div>
         <ArrowRight className="hidden md:block opacity-40 w-5 h-5" />
         <ArrowDown className="md:hidden opacity-40 w-5 h-5" />
 
         <div className={`text-center flex-1 p-2 rounded-lg ${isDark ? "bg-slate-900" : "bg-slate-100"}`}>
-            <span className="text-[9px] uppercase tracking-widest opacity-60 font-bold">{t.bioGoal}</span>
+            <span className="text-xs uppercase tracking-widest opacity-60 font-bold">{t.bioGoal}</span>
             <p className={`font-bold text-xs mt-1 ${isDark ? 'text-teal-400' : 'text-teal-600'}`}>{emotion.function[lang]}</p>
         </div>
     </div>
@@ -562,28 +571,22 @@ const IntensityLadder = ({ emotion, lang, isDark }: { emotion: Emotion, lang: 'p
         <h3 className="text-xs font-bold uppercase tracking-widest opacity-60 mb-5 flex items-center gap-2">
             <BarChart2 size={16} /> {t.energyScale}
         </h3>
+        {/* Na telefonie: etykieta i nazwa poziomu w jednym wierszu, pasek na całą szerokość pod nimi.
+            Od sm: jeden wiersz (etykieta | pasek | nazwa). Stałe szerokości kolumn zjadały pasek do 0 px przy 320 px. */}
         <div className="space-y-4 relative z-10">
-            <div className="flex items-center justify-between">
-                <span className="text-xs opacity-60 w-24 font-medium">{t.affect}</span>
-                <div className={`flex-1 mx-3 h-2 rounded-full overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
-                    <div className={`h-full w-full opacity-100 bg-current ${emotion.colorClass}`}></div>
+            {[
+                { label: t.affect, name: emotion.intensity.high[lang], bar: "w-full opacity-100", text: "font-bold" },
+                { label: t.emotion, name: emotion.intensity.medium[lang], bar: "w-2/3 opacity-70", text: "font-semibold" },
+                { label: t.signal, name: emotion.intensity.low[lang], bar: "w-1/3 opacity-40", text: "opacity-70" },
+            ].map((row) => (
+                <div key={row.label} className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-y-1.5">
+                    <span className="text-xs opacity-60 sm:w-24 sm:shrink-0 font-medium">{row.label}</span>
+                    <span className={`text-sm text-right sm:w-32 sm:shrink-0 sm:order-3 ${row.text}`}>{row.name}</span>
+                    <div className={`basis-full sm:basis-auto sm:flex-1 sm:mx-3 sm:order-2 h-2 rounded-full overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
+                        <div className={`h-full bg-current ${row.bar} ${emotion.colorClass}`}></div>
+                    </div>
                 </div>
-                <span className="text-sm font-bold w-32 text-right">{emotion.intensity.high[lang]}</span>
-            </div>
-            <div className="flex items-center justify-between">
-                <span className="text-xs opacity-60 w-24 font-medium">{t.emotion}</span>
-                <div className={`flex-1 mx-3 h-2 rounded-full overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
-                    <div className={`h-full w-2/3 opacity-70 bg-current ${emotion.colorClass}`}></div>
-                </div>
-                <span className="text-sm font-semibold w-32 text-right">{emotion.intensity.medium[lang]}</span>
-            </div>
-            <div className="flex items-center justify-between">
-                <span className="text-xs opacity-60 w-24 font-medium">{t.signal}</span>
-                <div className={`flex-1 mx-3 h-2 rounded-full overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
-                    <div className={`h-full w-1/3 opacity-40 bg-current ${emotion.colorClass}`}></div>
-                </div>
-                <span className="text-sm opacity-70 w-32 text-right">{emotion.intensity.low[lang]}</span>
-            </div>
+            ))}
         </div>
     </div>
   )
@@ -620,8 +623,49 @@ const App: React.FC = () => {
     setDyadPair([next1, next2])
   }, [])
 
+  // ─── Modal: natywny <dialog> (Esc, fokus w środku, tło nieaktywne) + wpis w historii,
+  // żeby gest/przycisk "wstecz" na telefonie zamykał okno zamiast wychodzić z aplikacji.
+  const dialogRef = useRef<HTMLDialogElement>(null)
+  const openerRef = useRef<HTMLElement | null>(null)
+  const closeBtnRef = useRef<HTMLButtonElement>(null)
+
+  const openEmotion = (item: Emotion, opener: HTMLElement) => {
+    openerRef.current = opener
+    setSelectedEmotion(item)
+  }
+
+  const closeModal = useCallback(() => {
+    if (window.history.state?.plutchikModal) window.history.back() // popstate zamknie okno
+    else setSelectedEmotion(null)
+  }, [])
+
+  // Po odświeżeniu strony z otwartym oknem przeglądarka pamięta stan historii,
+  // a okno już jest zamknięte — czyścimy wpis, żeby "zamknij" nie wyszło z aplikacji.
+  useEffect(() => {
+    if (window.history.state?.plutchikModal) window.history.replaceState(null, "")
+  }, [])
+
+  useEffect(() => {
+    if (!selectedEmotion) return
+    const dialog = dialogRef.current
+    if (dialog && !dialog.open) {
+      dialog.showModal()
+      closeBtnRef.current?.focus() // inaczej przeglądarka fokusuje przewijany kontener
+    }
+    if (!window.history.state?.plutchikModal) window.history.pushState({ plutchikModal: true }, "")
+    const onPop = () => setSelectedEmotion(null)
+    window.addEventListener("popstate", onPop)
+    document.body.style.overflow = "hidden"
+    return () => {
+      window.removeEventListener("popstate", onPop)
+      document.body.style.overflow = ""
+      openerRef.current?.focus()
+    }
+  }, [selectedEmotion])
+
   const isDark = stageMode === "dark"
   const t = uiTranslations[lang]
+  const nameColor = (e: Emotion) => (isDark ? e.colorClass : e.textLightClass)
 
   return (
     <div
@@ -653,11 +697,11 @@ const App: React.FC = () => {
         <div className="flex flex-col">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tighter uppercase leading-none">
             {t.title}
-            <span className="text-[10px] sm:text-xs font-normal opacity-40 ml-1 sm:ml-2 border-l border-current pl-1 sm:pl-2">
+            <span className="text-xs font-normal opacity-60 ml-1 sm:ml-2 border-l border-current pl-1 sm:pl-2">
               PLUTCHIK
             </span>
           </h1>
-          <span className="text-[9px] sm:text-[10px] font-mono opacity-50 uppercase mt-1">
+          <span className="text-xs font-mono opacity-70 uppercase mt-1">
             {t.subtitle}
           </span>
         </div>
@@ -672,7 +716,7 @@ const App: React.FC = () => {
           </button>
           <button
             onClick={toggleLang}
-            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95 border ${
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold uppercase transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95 border ${
               isDark ? "bg-slate-800 border-slate-700 text-slate-200" : "bg-white border-slate-200 text-slate-800"
             }`}
           >
@@ -698,16 +742,16 @@ const App: React.FC = () => {
           <button
             key={nav.id}
             onClick={() => { setView(nav.id); setSelectedEmotion(null); }}
-            className={`flex-1 min-w-[75px] sm:min-w-[100px] flex items-center justify-center gap-1 sm:gap-2 py-2.5 sm:py-3 rounded-xl transition-all font-bold text-[9px] sm:text-[11px] tracking-widest cursor-pointer ${
+            className={`flex-1 min-w-0 sm:min-w-[100px] flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 min-h-11 py-1.5 sm:py-3 rounded-xl transition-all font-bold text-xs sm:text-[13px] tracking-wide sm:tracking-widest cursor-pointer ${
               view === nav.id
                 ? isDark
                   ? "bg-slate-700 shadow-lg text-white border border-slate-600"
                   : "bg-white shadow-md text-slate-900 border border-slate-200"
-                : "opacity-50 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5 border border-transparent"
+                : "opacity-70 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5 border border-transparent"
             }`}
           >
             {React.cloneElement(nav.icon, { className: "w-3.5 h-3.5 sm:w-4 sm:h-4" })}
-            <span className="mt-0.5">{nav.label}</span>
+            <span className="sm:mt-0.5">{nav.label}</span>
           </button>
         ))}
       </nav>
@@ -731,7 +775,7 @@ const App: React.FC = () => {
             </div>
 
             <div className="text-center mb-6 sm:mb-8 w-full transition-opacity duration-300" style={{ opacity: isSpinning ? 0 : 1 }}>
-              <h2 className={`text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter mb-2 sm:mb-3 ${currentEmotion.colorClass}`}>
+              <h2 className={`text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter mb-2 sm:mb-3 ${nameColor(currentEmotion)}`}>
                 {currentEmotion.name[lang]}
               </h2>
               <p className={`text-sm sm:text-base md:text-lg leading-tight font-medium mb-6 opacity-80`}>
@@ -742,7 +786,7 @@ const App: React.FC = () => {
                 <div className={`flex-1 p-3 rounded-2xl flex items-start gap-3 border ${isDark ? "bg-slate-900/50 border-slate-800" : "bg-white border-slate-200 shadow-sm"}`}>
                   <Activity className="w-5 h-5 opacity-40 mt-0.5 shrink-0" />
                   <div>
-                    <span className="block text-[9px] uppercase tracking-widest opacity-50 font-bold mb-0.5">
+                    <span className="block text-xs uppercase tracking-widest opacity-70 font-bold mb-0.5">
                       {t.modal.impulse}
                     </span>
                     <span className="text-xs sm:text-sm font-semibold">{currentEmotion.impulse[lang]}</span>
@@ -751,7 +795,7 @@ const App: React.FC = () => {
                 <div className={`flex-1 p-3 rounded-2xl flex items-start gap-3 border ${isDark ? "bg-slate-900/50 border-slate-800" : "bg-white border-slate-200 shadow-sm"}`}>
                   <Target className="w-5 h-5 opacity-40 mt-0.5 shrink-0" />
                   <div>
-                    <span className="block text-[9px] uppercase tracking-widest opacity-50 font-bold mb-0.5">
+                    <span className="block text-xs uppercase tracking-widest opacity-70 font-bold mb-0.5">
                       {t.modal.action}
                     </span>
                     <span className="text-xs sm:text-sm font-semibold">{currentEmotion.action[lang]}</span>
@@ -782,7 +826,7 @@ const App: React.FC = () => {
           return (
             <div className="w-full flex flex-col items-center animate-fade px-2">
               <div className="text-center mb-6 sm:mb-8 max-w-lg">
-                <h2 className="text-xl sm:text-2xl font-black uppercase tracking-widest opacity-40 mb-1 sm:mb-2">{t.dyadsTitle}</h2>
+                <h2 className="text-xl sm:text-2xl font-black uppercase tracking-widest opacity-60 mb-1 sm:mb-2">{t.dyadsTitle}</h2>
                 <p className="text-xs sm:text-sm opacity-60 leading-relaxed px-4">{t.dyadsDesc}</p>
               </div>
 
@@ -797,7 +841,7 @@ const App: React.FC = () => {
                   <div className={`absolute inset-0 rounded-full opacity-60 ${dyadPair[0].bgLightClass}`} />
                   <div className="relative z-10 flex flex-col items-center">
                     <Icon1 className={`w-12 h-12 sm:w-16 sm:h-16 mb-2 sm:mb-3 ${dyadPair[0].colorClass}`} strokeWidth={1.5} />
-                    <h3 className={`text-sm sm:text-xl font-black uppercase tracking-tight text-center ${dyadPair[0].colorClass}`}>
+                    <h3 className={`text-sm sm:text-xl font-black uppercase tracking-tight text-center ${nameColor(dyadPair[0])}`}>
                       {dyadPair[0].name[lang]}
                     </h3>
                   </div>
@@ -813,7 +857,7 @@ const App: React.FC = () => {
                   <div className={`absolute inset-0 rounded-full opacity-60 ${dyadPair[1].bgLightClass}`} />
                   <div className="relative z-10 flex flex-col items-center">
                     <Icon2 className={`w-12 h-12 sm:w-16 sm:h-16 mb-2 sm:mb-3 ${dyadPair[1].colorClass}`} strokeWidth={1.5} />
-                    <h3 className={`text-sm sm:text-xl font-black uppercase tracking-tight text-center ${dyadPair[1].colorClass}`}>
+                    <h3 className={`text-sm sm:text-xl font-black uppercase tracking-tight text-center ${nameColor(dyadPair[1])}`}>
                       {dyadPair[1].name[lang]}
                     </h3>
                   </div>
@@ -831,17 +875,19 @@ const App: React.FC = () => {
                       : isDark ? "#0f172a" : "#f8fafc",
                 }}
               >
-                <div className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-widest opacity-60 mb-2 sm:mb-3">{t.dyadsResult}</div>
+                <div className="text-xs font-mono font-bold uppercase tracking-widest opacity-60 mb-2 sm:mb-3">{t.dyadsResult}</div>
                 {result ? (
                   <>
                     <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-3 sm:mb-4 tracking-tighter break-words hyphens-auto">
                       {result.name[lang]}
                     </h2>
-                    <span className={`inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest shadow-sm ${
-                        result.type === "primary" ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-400"
-                          : result.type === "secondary" ? "bg-blue-500/20 text-blue-700 dark:text-blue-400"
-                          : result.type === "tertiary" ? "bg-purple-500/20 text-purple-700 dark:text-purple-400"
-                          : "bg-red-500/20 text-red-700 dark:text-red-400"
+                    <span className={`inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-sm ${
+                        // Tryb zależy od przełącznika w aplikacji (isDark), nie od ustawień systemu —
+                        // wariant `dark:` Tailwinda v4 reaguje na system, więc tu go nie używamy.
+                        result.type === "primary" ? `bg-emerald-500/20 ${isDark ? "text-emerald-400" : "text-emerald-700"}`
+                          : result.type === "secondary" ? `bg-blue-500/20 ${isDark ? "text-blue-400" : "text-blue-700"}`
+                          : result.type === "tertiary" ? `bg-purple-500/20 ${isDark ? "text-purple-400" : "text-purple-700"}`
+                          : `bg-red-500/20 ${isDark ? "text-red-400" : "text-red-700"}`
                       }`}>
                       {lang === "pl"
                         ? result.type === "primary" ? "Podstawowa" : result.type === "secondary" ? "Drugorzędna" : result.type === "tertiary" ? "Trzeciorzędna" : "Przeciwieństwo (Konflikt)"
@@ -869,15 +915,16 @@ const App: React.FC = () => {
         {/* ─── CATALOG VIEW ─── */}
         {view === "catalog" && (
           <div className="w-full animate-fade pb-8 sm:pb-12 px-2">
-            <h2 className="text-xl sm:text-2xl font-black uppercase mb-6 sm:mb-8 text-center tracking-widest opacity-40">
+            <h2 className="text-xl sm:text-2xl font-black uppercase mb-6 sm:mb-8 text-center tracking-widest opacity-60">
               {t.catalogTitle}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {EMOTIONS.map((item) => (
+                // Klikalna jest cała karta, ale semantycznie przyciskiem jest nazwa emocji
+                // (jej ::after rozciąga obszar kliknięcia na kartę) — działa z klawiatury i czytnikiem ekranu.
                 <div
                   key={item.id}
-                  onClick={() => setSelectedEmotion(item)}
-                  className={`group relative p-5 sm:p-6 rounded-3xl border-2 transition-all cursor-pointer hover:-translate-y-1 active:scale-95 flex flex-col items-start gap-4 h-full justify-between ${
+                  className={`group relative p-5 sm:p-6 rounded-3xl border-2 transition-all cursor-pointer hover:-translate-y-1 active:scale-95 flex flex-col items-start gap-4 h-full justify-between has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-4 has-[:focus-visible]:outline-current ${
                     isDark ? "bg-slate-900 border-slate-800 hover:border-slate-600 shadow-md" : "bg-white border-slate-200 hover:border-slate-400 shadow-sm hover:shadow-xl"
                   }`}
                 >
@@ -886,19 +933,25 @@ const App: React.FC = () => {
                         <div className={`p-3 rounded-2xl transition-colors ${item.colorClass} ${item.bgLightClass}`}>
                            <item.icon size={28} strokeWidth={2} />
                         </div>
-                        <span className={`text-[9px] font-bold uppercase tracking-widest border px-2 py-1 rounded ${isDark ? "border-slate-700 text-slate-500" : "border-slate-200 text-slate-500"}`}>
+                        <span className={`text-xs font-bold uppercase tracking-widest border px-2 py-1 rounded ${isDark ? "border-slate-700 text-slate-400" : "border-slate-200 text-slate-500"}`}>
                             {item.function[lang]}
                         </span>
                     </div>
-                    <h3 className={`font-black uppercase text-xl sm:text-2xl tracking-tight mb-2 ${item.colorClass}`}>
-                      {item.name[lang]}
+                    <h3 className={`font-black uppercase text-xl sm:text-2xl tracking-tight mb-2 ${nameColor(item)}`}>
+                      <button
+                        type="button"
+                        onClick={(e) => openEmotion(item, e.currentTarget)}
+                        className="uppercase text-left cursor-pointer focus:outline-none after:absolute after:inset-0 after:rounded-3xl"
+                      >
+                        {item.name[lang]}
+                      </button>
                     </h3>
                     <p className="text-xs sm:text-sm leading-relaxed opacity-70 mb-4 line-clamp-3">
                       {item.desc[lang]}
                     </p>
                   </div>
                   
-                  <div className={`w-full pt-4 border-t flex items-center gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-wide opacity-80 ${isDark ? "border-slate-800" : "border-slate-100"}`}>
+                  <div className={`w-full pt-4 border-t flex items-center gap-2 text-xs font-bold uppercase tracking-wide opacity-80 ${isDark ? "border-slate-800" : "border-slate-100"}`}>
                       <Move size={14} />
                       <span>{t.modal.movementVector}: {item.vector[lang].split('/')[0]}</span>
                   </div>
@@ -921,7 +974,7 @@ const App: React.FC = () => {
                   ? "W latach 1960-1980 amerykański psycholog Robert Plutchik opracował ewolucyjną teorię emocji. Zaproponował istnienie 8 emocji podstawowych. Są one wrodzone i bezpośrednio odnoszą się do zachowań adaptacyjnych, które mają na celu pomoc w przetrwaniu."
                   : "Between 1960-1980, American psychologist Robert Plutchik developed an evolutionary theory of emotion. He proposed the existence of 8 basic emotions. They are innate and directly relate to adaptive behaviors aimed at helping in survival."}
               </p>
-              <p className={`text-[10px] sm:text-xs uppercase tracking-widest font-bold inline-block px-3 py-1.5 rounded-lg ${isDark ? "bg-slate-800 text-slate-300" : "bg-slate-100 text-slate-600"}`}>
+              <p className={`text-xs uppercase tracking-widest font-bold inline-block px-3 py-1.5 rounded-lg ${isDark ? "bg-slate-800 text-slate-300" : "bg-slate-100 text-slate-600"}`}>
                 {lang === "pl" ? "Z nich wynikają wszystkie inne emocje." : "All other emotions stem from them."}
               </p>
             </section>
@@ -984,25 +1037,33 @@ const App: React.FC = () => {
 
       {/* ─── MODAL (Aktorskie Kompendium) ─── */}
       {selectedEmotion && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade" onClick={() => setSelectedEmotion(null)}>
-          <div 
-            className={`w-full max-w-5xl max-h-[95vh] overflow-y-auto rounded-3xl shadow-2xl animate-slide border ${isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-slate-50 border-slate-300 text-slate-900"}`} 
-            onClick={e => e.stopPropagation()}
+        <dialog
+          ref={dialogRef}
+          aria-labelledby="emotion-modal-title"
+          onCancel={(e) => { e.preventDefault(); closeModal() }}
+          onClick={(e) => { if (e.target === e.currentTarget) closeModal() }}
+          className="fixed inset-0 z-50 m-0 w-full h-full max-w-none max-h-none open:flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade"
+        >
+          <div
+            className={`w-full max-w-5xl max-h-[95vh] overflow-y-auto overscroll-contain rounded-3xl shadow-2xl animate-slide border ${isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-slate-50 border-slate-300 text-slate-900"}`}
           >
             {/* Header Modala */}
-            <div className={`p-6 sm:p-8 flex items-center justify-between gap-4 sticky top-0 z-20 backdrop-blur-md border-b ${isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-slate-50/90 border-slate-200'}`}>
-              <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-2xl ${selectedEmotion.bgLightClass} ${selectedEmotion.colorClass}`}>
+            <div className={`p-4 sm:p-8 flex items-center justify-between gap-4 sticky top-0 z-20 backdrop-blur-md border-b ${isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-slate-50/90 border-slate-200'}`}>
+              <div className="flex items-center gap-4 min-w-0">
+                <div className={`hidden sm:block p-3 rounded-2xl ${selectedEmotion.bgLightClass} ${selectedEmotion.colorClass}`}>
                   <selectedEmotion.icon size={32} strokeWidth={2} />
                 </div>
                 <div>
-                  <h2 className={`text-2xl sm:text-4xl font-black uppercase ${selectedEmotion.colorClass}`}>{selectedEmotion.name[lang]}</h2>
+                  <h2 id="emotion-modal-title" className={`text-2xl sm:text-4xl font-black uppercase break-words ${nameColor(selectedEmotion)}`}>{selectedEmotion.name[lang]}</h2>
                   <p className="font-serif italic text-xs sm:text-sm opacity-80 mt-1">{t.modal.bioGoal}: <strong className="font-sans">{selectedEmotion.function[lang]}</strong></p>
                 </div>
               </div>
-              <button 
-                onClick={() => setSelectedEmotion(null)} 
-                className={`p-3 rounded-xl transition-all border ${isDark ? "bg-slate-900 border-slate-700 hover:bg-slate-800 hover:border-slate-500" : "bg-white border-slate-300 hover:bg-slate-100"}`}
+              <button
+                ref={closeBtnRef}
+                type="button"
+                onClick={closeModal}
+                aria-label={t.modal.back}
+                className={`p-3 rounded-xl transition-all border shrink-0 ${isDark ? "bg-slate-900 border-slate-700 hover:bg-slate-800 hover:border-slate-500" : "bg-white border-slate-300 hover:bg-slate-100"}`}
               >
                 <X size={24} />
               </button>
@@ -1013,7 +1074,7 @@ const App: React.FC = () => {
               <section>
                 <h3 className="text-xs font-bold uppercase tracking-widest opacity-60 mb-4">{t.modal.mechanism}</h3>
                 <EvoChain emotion={selectedEmotion} lang={lang} isDark={isDark} />
-                <p className="text-[10px] sm:text-xs opacity-50 text-center italic mt-2">{t.modal.neuroception}</p>
+                <p className="text-xs opacity-70 text-center italic mt-2">{t.modal.neuroception}</p>
               </section>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -1057,11 +1118,11 @@ const App: React.FC = () => {
                   <h3 className="text-xs font-bold uppercase tracking-widest opacity-60 mb-4">{t.modal.actorPerspective}</h3>
                   <div className="flex flex-col md:flex-row gap-6">
                       <div className="flex-1">
-                          <span className="text-[10px] uppercase font-bold opacity-50 block mb-1">{t.modal.bodySignal}</span>
+                          <span className="text-xs uppercase font-bold opacity-70 block mb-1">{t.modal.bodySignal}</span>
                           <p className="text-lg font-serif italic font-medium">"{selectedEmotion.impulse[lang]}"</p>
                       </div>
                       <div className="flex-1">
-                          <span className="text-[10px] uppercase font-bold opacity-50 block mb-1">{t.modal.scenicGoal}</span>
+                          <span className="text-xs uppercase font-bold opacity-70 block mb-1">{t.modal.scenicGoal}</span>
                           <p className="text-sm font-medium">{selectedEmotion.desc[lang]}</p>
                       </div>
                       <div className={`flex-1 md:pl-6 flex items-center md:border-l ${isDark ? 'border-slate-700' : 'border-slate-300'}`}>
@@ -1073,13 +1134,13 @@ const App: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </dialog>
       )}
 
       {/* Footer */}
       <footer className="mt-6 sm:mt-8 text-center w-full max-w-md pb-6 sm:pb-8 flex flex-col items-center gap-4">
         <div
-          className={`text-[9px] sm:text-[10px] font-mono px-3 py-1.5 sm:px-4 sm:py-2 rounded border inline-block ${
+          className={`text-xs font-mono px-3 py-1.5 sm:px-4 sm:py-2 rounded border inline-block ${
             isDark ? "border-slate-800 text-slate-500 bg-slate-900/50" : "border-slate-300 text-slate-500 bg-white"
           }`}
         >
@@ -1089,18 +1150,18 @@ const App: React.FC = () => {
           </span>
         </div>
         
-        <div className="text-[10px] sm:text-[11px] opacity-40 hover:opacity-80 transition-opacity text-center mt-2 max-w-md leading-relaxed">
+        <div className="text-xs opacity-70 hover:opacity-100 transition-opacity text-center mt-2 max-w-md leading-relaxed">
           {lang === "pl" ? (
             <>
               &copy; 2025 Oskar Hamerski.<br />
               Interaktywne narzędzie dydaktyczne opracowane dla studentów Wydziału Aktorskiego Akademii Teatralnej w Warszawie.<br />
-              <span className="font-semibold uppercase tracking-wider text-[9px] mt-1 inline-block">Do użytku edukacyjnego</span>
+              <span className="font-semibold uppercase tracking-wider text-xs mt-1 inline-block">Do użytku edukacyjnego</span>
             </>
           ) : (
             <>
               &copy; 2025 Oskar Hamerski.<br />
               Interactive educational tool developed for the students of the Acting Department at the Theatre Academy in Warsaw.<br />
-              <span className="font-semibold uppercase tracking-wider text-[9px] mt-1 inline-block">For educational use</span>
+              <span className="font-semibold uppercase tracking-wider text-xs mt-1 inline-block">For educational use</span>
             </>
           )}
         </div>
