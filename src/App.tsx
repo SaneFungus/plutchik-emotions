@@ -605,11 +605,29 @@ const App: React.FC = () => {
   const toggleLang = () => setLang((l) => (l === "pl" ? "en" : "pl"))
   const toggleStage = () => setStageMode((s) => (s === "light" ? "dark" : "light"))
 
+  // Pula emocji jeszcze niewylosowanych w bieżącej "talii" (losowanie bez powtórzeń,
+  // dopiero po wyczerpaniu wszystkich 8 tasujemy nową talię).
+  const shuffleBagRef = useRef<Emotion[]>([])
+
   const handleShuffle = useCallback(() => {
     setIsSpinning(true)
     setTimeout(() => {
-      const next = EMOTIONS[Math.floor(Math.random() * EMOTIONS.length)]
-      setCurrentEmotion(next)
+      setCurrentEmotion((prev) => {
+        if (shuffleBagRef.current.length === 0) {
+          const bag = [...EMOTIONS]
+          for (let i = bag.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1))
+            ;[bag[i], bag[j]] = [bag[j], bag[i]]
+          }
+          // nowa talia nie może zaczynać się od emocji, na której skończyła się poprzednia
+          if (bag.length > 1 && bag[0].id === prev.id) {
+            const swapIdx = 1 + Math.floor(Math.random() * (bag.length - 1))
+            ;[bag[0], bag[swapIdx]] = [bag[swapIdx], bag[0]]
+          }
+          shuffleBagRef.current = bag
+        }
+        return shuffleBagRef.current.shift()!
+      })
       setIsSpinning(false)
     }, 400)
   }, [])
