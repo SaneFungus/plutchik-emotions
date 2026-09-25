@@ -20,6 +20,7 @@ Gemfile.lock
 # Node / Vite: zaleznosci i wynik builda (tworzone lokalnie, nie commitowac)
 node_modules/
 dist/
+.vite/
 
 # Claude Code: lokalna konfiguracja sesji, nie commitowac
 .claude/
