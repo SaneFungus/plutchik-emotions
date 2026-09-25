@@ -1,0 +1,43 @@
+<!doctype html>
+<!--
+  Źródło obrazka public/og-image.png (podgląd linku na Messengerze, Teamsie itp., 1200×630).
+  Odtworzenie (z katalogu repo, PowerShell):
+    & "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --headless --disable-gpu --hide-scrollbars `
+      --window-size=1200,630 --screenshot="$PWD\public\og-image.png" "$PWD\scripts\og-image.html"
+  Kolory płatków = kolory emocji z src/App.tsx (pole hex), w kolejności koła Plutchika.
+-->
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<style>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    background: #020617; color: #f1f5f9;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex; align-items: center; gap: 64px; padding: 0 80px; box-sizing: border-box;
+  }
+  svg { flex: none; }
+  h1 { font-size: 76px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.03em; line-height: 0.95; margin: 0 0 24px; }
+  p { font-size: 30px; line-height: 1.35; margin: 0; color: #cbd5e1; }
+  .small { margin-top: 28px; font-size: 22px; color: #94a3b8; font-family: ui-monospace, Consolas, monospace; text-transform: uppercase; letter-spacing: 0.08em; }
+</style>
+</head>
+<body>
+  <svg width="440" height="440" viewBox="-220 -220 440 440" aria-hidden="true">
+    <g id="petals"></g>
+    <circle r="46" fill="#020617" />
+  </svg>
+  <div>
+    <h1>Koło Emocji<br />Plutchika</h1>
+    <p>8 emocji podstawowych, ich mieszanki i sygnały z ciała — narzędzie dla studentów aktorstwa.</p>
+    <p class="small">Akademia Teatralna w Warszawie</p>
+  </div>
+<script>
+  // Radość, Zaufanie, Strach, Zaskoczenie, Smutek, Wstręt, Gniew, Oczekiwanie
+  const colors = ["#eab308", "#84cc16", "#10b981", "#06b6d4", "#3b82f6", "#a855f7", "#ef4444", "#f97316"]
+  document.getElementById("petals").innerHTML = colors
+    .map((c, i) => `<ellipse cx="0" cy="-104" rx="56" ry="100" fill="${c}" fill-opacity="0.9" transform="rotate(${i * 45})" />`)
+    .join("")
+</script>
+</body>
+</html>

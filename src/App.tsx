@@ -2,8 +2,6 @@ import React, { useState, useCallback, useEffect, useRef } from "react"
 import {
   Shuffle,
   Combine,
-  Eye,
-  EyeOff,
   BookOpen,
   LayoutGrid,
   Layers,
@@ -12,6 +10,7 @@ import {
   AlertTriangle,
   Flame,
   Sun,
+  Moon,
   Anchor,
   UserCheck,
   MinusCircle,
@@ -33,6 +32,9 @@ const uiTranslations = {
     title: "Koło Emocji",
     subtitle: "Aparat Aktorski & Teoria Ewolucyjna",
     nav: { shuffle: "LOSUJ", dyads: "DIADY", catalog: "KATALOG", theory: "TEORIA" },
+    stageToggle: { light: "Włącz tryb jasny", dark: "Włącz tryb ciemny" },
+    // Przycisk języka opisany w języku, na który przełącza — tak przeczyta go czytnik ekranu
+    langToggle: { lang: "en", label: "Switch to English" },
     shuffleBtn: "LOSUJ EMOCJĘ",
     dyadsTitle: "Mieszanina Emocji",
     dyadsDesc: "Emocje łączą się w diady tworząc złożone stany emocjonalne.",
@@ -66,6 +68,8 @@ const uiTranslations = {
     title: "Emotion Wheel",
     subtitle: "Actor's Tool & Evolutionary Theory",
     nav: { shuffle: "SHUFFLE", dyads: "DYADS", catalog: "CATALOG", theory: "THEORY" },
+    stageToggle: { light: "Switch to light mode", dark: "Switch to dark mode" },
+    langToggle: { lang: "pl", label: "Przełącz na polski" },
     shuffleBtn: "RANDOM EMOTION",
     dyadsTitle: "Emotion Mixture",
     dyadsDesc: "Emotions combine into dyads creating complex emotional states.",
@@ -358,7 +362,7 @@ const EMOTIONS: Emotion[] = [
     action: { pl: "WYPYCHANIE / PLUCIE", en: "PUSHING AWAY / SPITTING" },
     function: { pl: "ODRZUCENIE", en: "REJECTION" },
     intensity: {
-      low: { pl: "Niechęć", en: "Boredom" },
+      low: { pl: "Nuda", en: "Boredom" },
       medium: { pl: "Wstręt", en: "Disgust" },
       high: { pl: "Odraza", en: "Loathing" }
     },
@@ -382,7 +386,7 @@ const EMOTIONS: Emotion[] = [
         "Covering mouth or nose with hand",
         "Gag reflex, swallowing saliva",
         "Retracting torso (leaning back)",
-        "Purging lips (blocking entry)"
+        "Pressing lips together (blocking entry)"
       ]
     },
     colorClass: "text-purple-500",
@@ -788,7 +792,7 @@ const getDyad = (e1Id: string, e2Id: string): DyadResult | null => {
     "FEAR+SURPRISE": { name: { pl: "Poruszenie", en: "Alarm" }, type: "primary" },
     "SADNESS+SURPRISE": { name: { pl: "Rozczarowanie", en: "Disappointment" }, type: "primary" },
     "DISGUST+SADNESS": { name: { pl: "Żal", en: "Remorse" }, type: "primary" },
-    "ANGER+DISGUST": { name: { pl: "Zawiść", en: "Contempt/Envy" }, type: "primary" },
+    "ANGER+DISGUST": { name: { pl: "Pogarda", en: "Contempt" }, type: "primary" },
     "ANGER+ANTICIPATION": { name: { pl: "Agresja", en: "Aggression" }, type: "primary" },
     "ANTICIPATION+JOY": { name: { pl: "Optymizm", en: "Optimism" }, type: "primary" },
     "FEAR+JOY": { name: { pl: "Poczucie winy", en: "Guilt" }, type: "secondary" },
@@ -976,18 +980,86 @@ const IntensityLadder = ({ emotion, lang, isDark }: { emotion: Emotion, lang: 'p
   )
 }
 
+// ─── Adres strony: zakładka i otwarta karta emocji ─────────────────
+// Link do wysłania studentom, np. #katalog albo #katalog/gniew (otwiera kartę Gniewu).
+// Hash, nie ścieżka: GitHub Pages serwuje jeden plik, a hash nie wymaga przekierowań.
+type View = "shuffle" | "dyads" | "catalog" | "manifesto"
+const VIEW_SLUGS: Record<View, string> = { shuffle: "losuj", dyads: "diady", catalog: "katalog", manifesto: "teoria" }
+
+// Polska nazwa bez ogonków: Radość → radosc, Wstręt → wstret
+const slugOf = (e: Emotion) => e.name.pl.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+
+const hashFor = (view: View, emotion?: Emotion | null) =>
+  `#${VIEW_SLUGS[view]}${emotion ? `/${slugOf(emotion)}` : ""}`
+
+const parseHash = (hash: string): { view: View | null; emotion: Emotion | null } => {
+  const [v, e] = decodeURIComponent(hash.replace(/^#\/?/, "")).toLowerCase().split("/")
+  const view = (Object.keys(VIEW_SLUGS) as View[]).find((k) => VIEW_SLUGS[k] === v) ?? null
+  // przyjmujemy też angielski identyfikator (#katalog/anger)
+  const emotion = e ? EMOTIONS.find((x) => slugOf(x) === e || x.id.toLowerCase() === e) ?? null : null
+  return { view, emotion: view ? emotion : null }
+}
+
+// ─── Ustawienia zapamiętane w przeglądarce (język, tryb jasny/ciemny) ─
+// try/catch: w trybie prywatnym albo przy zablokowanych danych strony dostęp do pamięci rzuca błąd.
+const SETTINGS_KEY = "plutchik-settings"
+type Settings = { lang?: "pl" | "en"; stage?: "light" | "dark" }
+
+const loadSettings = (): Settings => {
+  try {
+    const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? "{}")
+    return {
+      lang: s.lang === "en" || s.lang === "pl" ? s.lang : undefined,
+      stage: s.stage === "light" || s.stage === "dark" ? s.stage : undefined,
+    }
+  } catch {
+    return {}
+  }
+}
+
+const saveSettings = (s: Settings) => {
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)) } catch { /* bez pamięci działa jak dotąd */ }
+}
+
+const PAGE_TITLE = { pl: "8 emocji Roberta Plutchika", en: "Robert Plutchik's 8 Emotions" }
+
 // ─── App Component ────────────────────────────────────────────────
 const App: React.FC = () => {
-  const [lang, setLang] = useState<"pl" | "en">("pl")
-  const [view, setView] = useState<"shuffle" | "dyads" | "manifesto" | "catalog">("shuffle")
-  const [currentEmotion, setCurrentEmotion] = useState<Emotion>(EMOTIONS[0])
+  // Stan startowy: zakładka i karta z adresu, język i tryb z pamięci przeglądarki
+  const [initial] = useState(() => ({ ...parseHash(window.location.hash), ...loadSettings() }))
+  const [lang, setLang] = useState<"pl" | "en">(initial.lang ?? "pl")
+  const [view, setView] = useState<View>(initial.view ?? "shuffle")
+  const [currentEmotion, setCurrentEmotion] = useState<Emotion>(
+    initial.view === "shuffle" && initial.emotion ? initial.emotion : EMOTIONS[0]
+  )
   const [dyadPair, setDyadPair] = useState<[Emotion, Emotion]>([EMOTIONS[0], EMOTIONS[1]])
-  const [stageMode, setStageMode] = useState<"light" | "dark">("dark")
+  const [stageMode, setStageMode] = useState<"light" | "dark">(initial.stage ?? "dark")
   const [isSpinning, setIsSpinning] = useState(false)
-  const [selectedEmotion, setSelectedEmotion] = useState<Emotion | null>(null)
+  const [selectedEmotion, setSelectedEmotion] = useState<Emotion | null>(initial.emotion)
 
   const toggleLang = () => setLang((l) => (l === "pl" ? "en" : "pl"))
   const toggleStage = () => setStageMode((s) => (s === "light" ? "dark" : "light"))
+
+  useEffect(() => { saveSettings({ lang, stage: stageMode }) }, [lang, stageMode])
+
+  // Język strony dla czytnika ekranu (inaczej czyta polski tekst angielskim głosem) i tytuł karty
+  useEffect(() => {
+    document.documentElement.lang = lang
+    document.title = PAGE_TITLE[lang]
+  }, [lang])
+
+  // Wstecz/dalej w przeglądarce albo ręcznie zmieniony adres → ustawiamy zakładkę i kartę z adresu
+  useEffect(() => {
+    const onPop = () => {
+      const { view: v, emotion } = parseHash(window.location.hash)
+      const nextView = v ?? "shuffle"
+      setView(nextView)
+      setSelectedEmotion(emotion)
+      if (nextView === "shuffle" && emotion) setCurrentEmotion(emotion)
+    }
+    window.addEventListener("popstate", onPop)
+    return () => window.removeEventListener("popstate", onPop)
+  }, [])
 
   // Pula emocji jeszcze niewylosowanych w bieżącej "talii" (losowanie bez powtórzeń,
   // dopiero po wyczerpaniu wszystkich 8 tasujemy nową talię).
@@ -1025,8 +1097,9 @@ const App: React.FC = () => {
     setDyadPair([next1, next2])
   }, [])
 
-  // ─── Modal: natywny <dialog> (Esc, fokus w środku, tło nieaktywne) + wpis w historii,
-  // żeby gest/przycisk "wstecz" na telefonie zamykał okno zamiast wychodzić z aplikacji.
+  // ─── Modal: natywny <dialog> (Esc, fokus w środku, tło nieaktywne) + wpis w historii
+  // z adresem karty (#katalog/gniew), żeby gest/przycisk "wstecz" na telefonie zamykał okno
+  // zamiast wychodzić z aplikacji, a adres dało się skopiować i wysłać.
   const dialogRef = useRef<HTMLDialogElement>(null)
   const openerRef = useRef<HTMLElement | null>(null)
   const closeBtnRef = useRef<HTMLButtonElement>(null)
@@ -1037,19 +1110,19 @@ const App: React.FC = () => {
   const openEmotion = (item: Emotion, opener: HTMLElement, toBodyDict = false) => {
     openerRef.current = opener
     scrollToBodyDictRef.current = toBodyDict
+    window.history.pushState({ plutchikModal: true }, "", hashFor(view, item))
     setSelectedEmotion(item)
   }
 
   const closeModal = useCallback(() => {
-    if (window.history.state?.plutchikModal) window.history.back() // popstate zamknie okno
-    else setSelectedEmotion(null)
-  }, [])
-
-  // Po odświeżeniu strony z otwartym oknem przeglądarka pamięta stan historii,
-  // a okno już jest zamknięte — czyścimy wpis, żeby "zamknij" nie wyszło z aplikacji.
-  useEffect(() => {
-    if (window.history.state?.plutchikModal) window.history.replaceState(null, "")
-  }, [])
+    // Okno otwarte kliknięciem (albo odświeżone po kliknięciu) ma pod sobą wpis zakładki — wracamy do niego,
+    // popstate zamknie okno. Okno otwarte prosto z linku nie ma pod sobą nic naszego — tylko zmieniamy adres.
+    if (window.history.state?.plutchikModal) window.history.back()
+    else {
+      window.history.replaceState(null, "", hashFor(view))
+      setSelectedEmotion(null)
+    }
+  }, [view])
 
   useEffect(() => {
     if (!selectedEmotion) return
@@ -1062,20 +1135,23 @@ const App: React.FC = () => {
       scrollToBodyDictRef.current = false
       bodyDictRef.current?.scrollIntoView({ block: "start" })
     }
-    if (!window.history.state?.plutchikModal) window.history.pushState({ plutchikModal: true }, "")
-    const onPop = () => setSelectedEmotion(null)
-    window.addEventListener("popstate", onPop)
     document.body.style.overflow = "hidden"
     return () => {
-      window.removeEventListener("popstate", onPop)
       document.body.style.overflow = ""
       openerRef.current?.focus()
     }
   }, [selectedEmotion])
 
   // Przejście między zakładkami z treści (np. z końca Teorii) — zawsze od góry nowego widoku
-  const goTo = (next: "shuffle" | "dyads" | "catalog" | "manifesto") => {
+  // Zmiana zakładki podmienia adres zamiast dopisywać go do historii: "wstecz" nie skacze po zakładkach.
+  const changeView = (next: View) => {
+    window.history.replaceState(null, "", hashFor(next))
     setView(next)
+    setSelectedEmotion(null)
+  }
+
+  const goTo = (next: View) => {
+    changeView(next)
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" })
   }
@@ -1125,22 +1201,31 @@ const App: React.FC = () => {
             {t.subtitle}
           </span>
         </div>
-        <div className="flex gap-1.5 sm:gap-2">
+        {/* Oba przyciski pokazują to, na co się przełącza (księżyc = włącz ciemny, EN = włącz angielski).
+            min-w-11/min-h-11 = 44 px, minimalny cel dotykowy. */}
+        <div className="flex gap-1.5 sm:gap-2 shrink-0">
           <button
+            type="button"
             onClick={toggleStage}
-            className={`p-2 sm:p-2.5 rounded-full transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95 border ${
+            aria-label={isDark ? t.stageToggle.light : t.stageToggle.dark}
+            title={isDark ? t.stageToggle.light : t.stageToggle.dark}
+            className={`min-w-11 min-h-11 inline-flex items-center justify-center rounded-full transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95 border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${
               isDark ? "bg-slate-800 border-slate-700 text-slate-200" : "bg-white border-slate-200 text-slate-800"
             }`}
           >
-            {isDark ? <Eye size={16} className="sm:w-5 sm:h-5" /> : <EyeOff size={16} className="sm:w-5 sm:h-5" />}
+            {isDark ? <Sun aria-hidden="true" className="w-5 h-5" /> : <Moon aria-hidden="true" className="w-5 h-5" />}
           </button>
           <button
+            type="button"
             onClick={toggleLang}
-            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold uppercase transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95 border ${
+            lang={t.langToggle.lang}
+            aria-label={t.langToggle.label}
+            title={t.langToggle.label}
+            className={`min-w-11 min-h-11 px-3 sm:px-4 inline-flex items-center justify-center rounded-full text-xs font-bold uppercase transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95 border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${
               isDark ? "bg-slate-800 border-slate-700 text-slate-200" : "bg-white border-slate-200 text-slate-800"
             }`}
           >
-            {lang}
+            {t.langToggle.lang}
           </button>
         </div>
       </header>
@@ -1161,7 +1246,8 @@ const App: React.FC = () => {
         ).map((nav) => (
           <button
             key={nav.id}
-            onClick={() => { setView(nav.id); setSelectedEmotion(null); }}
+            onClick={() => changeView(nav.id)}
+            aria-current={view === nav.id ? "page" : undefined}
             className={`flex-1 min-w-0 sm:min-w-[100px] flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 min-h-11 py-1.5 sm:py-3 rounded-xl transition-all font-bold text-xs sm:text-[13px] tracking-wide sm:tracking-widest cursor-pointer ${
               view === nav.id
                 ? isDark
