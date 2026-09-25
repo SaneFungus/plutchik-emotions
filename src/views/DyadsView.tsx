@@ -1,5 +1,5 @@
 import { Shuffle } from "lucide-react"
-import { getDyad, DYAD_TYPE_LABELS } from "../tresc/diady"
+import { getDyad, DYAD_TYPE_LABELS, type DyadType } from "../tresc/diady"
 import { uiTranslations } from "../tresc/interfejs"
 import type { Emotion, Lang } from "../tresc/typy"
 import { DYAD_ALPHA, mixHex } from "../lib/kolory"
@@ -8,13 +8,21 @@ import { DYAD_ALPHA, mixHex } from "../lib/kolory"
 type Props = {
   pair: [Emotion, Emotion]
   lang: Lang
-  isDark: boolean
   onRandomPair: () => void
 }
 
-export const DyadsView = ({ pair, lang, isDark, onRandomPair }: Props) => {
+// Kolor plakietki z rodzajem diady
+const TYPE_BADGE: Record<DyadType, string> = {
+  primary: "bg-emerald-500/20 text-emerald-700 dark:text-emerald-400",
+  secondary: "bg-blue-500/20 text-blue-700 dark:text-blue-400",
+  tertiary: "bg-purple-500/20 text-purple-700 dark:text-purple-400",
+  opposite: "bg-red-500/20 text-red-700 dark:text-red-400",
+}
+
+export const DyadsView = ({ pair, lang, onRandomPair }: Props) => {
   const t = uiTranslations[lang]
   const result = getDyad(pair[0].id, pair[1].id)
+  const blends = result && result.type !== "opposite"
   const Icon1 = pair[0].icon
   const Icon2 = pair[1].icon
   return (
@@ -65,16 +73,12 @@ export const DyadsView = ({ pair, lang, isDark, onRandomPair }: Props) => {
         })}
       </div>
 
-      {/* Result */}
+      {/* Result: gdy emocje się mieszają, tło to przejście między ich kolorami; inaczej jednolite */}
       <div
         className={`w-full max-w-2xl p-6 sm:p-8 md:p-10 rounded-[2rem] text-center border-4 shadow-2xl mb-8 sm:mb-10 transition-all duration-500 ${
-          result?.type === "opposite" ? "border-red-500/30" : isDark ? "border-slate-800" : "border-white"
-        }`}
-        style={{
-          background: result && result.type !== "opposite"
-              ? `linear-gradient(135deg, ${pair[0].hex}22 0%, ${pair[1].hex}22 100%)`
-              : isDark ? "#0f172a" : "#f8fafc",
-        }}
+          result?.type === "opposite" ? "border-red-500/30" : "border-white dark:border-slate-800"
+        } ${blends ? "" : "bg-[#f8fafc] dark:bg-[#0f172a]"}`}
+        style={blends ? { background: `linear-gradient(135deg, ${pair[0].hex}22 0%, ${pair[1].hex}22 100%)` } : undefined}
       >
         <div className="text-xs font-mono font-bold uppercase tracking-widest opacity-60 mb-2 sm:mb-3">{t.dyadsResult}</div>
         {result ? (
@@ -82,14 +86,7 @@ export const DyadsView = ({ pair, lang, isDark, onRandomPair }: Props) => {
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-3 sm:mb-4 tracking-tighter break-words hyphens-auto">
               {result.name[lang]}
             </h2>
-            <span className={`inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-sm ${
-                // Tryb zależy od przełącznika w aplikacji (isDark), nie od ustawień systemu —
-                // wariant `dark:` Tailwinda v4 reaguje na system, więc tu go nie używamy.
-                result.type === "primary" ? `bg-emerald-500/20 ${isDark ? "text-emerald-400" : "text-emerald-700"}`
-                  : result.type === "secondary" ? `bg-blue-500/20 ${isDark ? "text-blue-400" : "text-blue-700"}`
-                  : result.type === "tertiary" ? `bg-purple-500/20 ${isDark ? "text-purple-400" : "text-purple-700"}`
-                  : `bg-red-500/20 ${isDark ? "text-red-400" : "text-red-700"}`
-              }`}>
+            <span className={`inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-sm ${TYPE_BADGE[result.type]}`}>
               {DYAD_TYPE_LABELS[result.type][lang]}
             </span>
           </>
@@ -100,9 +97,7 @@ export const DyadsView = ({ pair, lang, isDark, onRandomPair }: Props) => {
 
       <button
         onClick={onRandomPair}
-        className={`w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-8 sm:px-10 py-4 sm:py-5 rounded-2xl text-base sm:text-xl font-black transition-all active:scale-95 shadow-xl cursor-pointer ${
-          isDark ? "bg-slate-100 text-slate-900 hover:bg-white" : "bg-slate-900 text-white hover:bg-slate-800"
-        }`}
+        className="w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-8 sm:px-10 py-4 sm:py-5 rounded-2xl text-base sm:text-xl font-black transition-all active:scale-95 shadow-xl cursor-pointer bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
       >
         <Shuffle size={20} className="sm:w-6 sm:h-6" />
         {t.dyadsBtn}

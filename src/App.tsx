@@ -128,33 +128,11 @@ const App: React.FC = () => {
   const t = uiTranslations[lang]
 
   return (
+    // Klasa "dark" przełącza w całej aplikacji (razem z oknem emocji) warianty dark: z index.css
     <div
-      className={`min-h-screen transition-colors duration-700 p-3 sm:p-6 md:p-8 flex flex-col items-center overflow-x-hidden ${
-        isDark ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-900"
-      }`}
+      className={`${isDark ? "dark " : ""}min-h-screen transition-colors duration-700 p-3 sm:p-6 md:p-8 flex flex-col items-center overflow-x-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100`}
       style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
     >
-      <style>{`
-        @keyframes roulette {
-          0% { transform: scale(0.9) rotate(0deg); opacity: 0.5; filter: blur(4px); }
-          50% { transform: scale(1.05) rotate(180deg); opacity: 0.8; filter: blur(2px); }
-          100% { transform: scale(1) rotate(360deg); opacity: 1; filter: blur(0px); }
-        }
-        .animate-roulette {
-          animation: roulette 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-        }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .animate-fade { animation: fadeIn 0.3s ease-out forwards; }
-        .animate-slide { animation: slideUp 0.4s ease-out forwards; }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        @media (prefers-reduced-motion: reduce) {
-          .animate-roulette, .animate-fade, .animate-slide { animation-duration: 1ms; }
-        }
-      `}</style>
-
       {/* Header */}
       <header className="w-full max-w-5xl flex justify-between items-center mb-6 md:mb-8 pt-2">
         <div className="flex flex-col">
@@ -176,9 +154,7 @@ const App: React.FC = () => {
             onClick={toggleStage}
             aria-label={isDark ? t.stageToggle.light : t.stageToggle.dark}
             title={isDark ? t.stageToggle.light : t.stageToggle.dark}
-            className={`min-w-11 min-h-11 inline-flex items-center justify-center rounded-full transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95 border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${
-              isDark ? "bg-slate-800 border-slate-700 text-slate-200" : "bg-white border-slate-200 text-slate-800"
-            }`}
+            className="min-w-11 min-h-11 inline-flex items-center justify-center rounded-full transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95 border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current bg-white border-slate-200 text-slate-800 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
           >
             {isDark ? <Sun aria-hidden="true" className="w-5 h-5" /> : <Moon aria-hidden="true" className="w-5 h-5" />}
           </button>
@@ -188,9 +164,7 @@ const App: React.FC = () => {
             lang={t.langToggle.lang}
             aria-label={t.langToggle.label}
             title={t.langToggle.label}
-            className={`min-w-11 min-h-11 px-3 sm:px-4 inline-flex items-center justify-center rounded-full text-xs font-bold uppercase transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95 border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${
-              isDark ? "bg-slate-800 border-slate-700 text-slate-200" : "bg-white border-slate-200 text-slate-800"
-            }`}
+            className="min-w-11 min-h-11 px-3 sm:px-4 inline-flex items-center justify-center rounded-full text-xs font-bold uppercase transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95 border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current bg-white border-slate-200 text-slate-800 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
           >
             {t.langToggle.lang}
           </button>
@@ -199,9 +173,7 @@ const App: React.FC = () => {
 
       {/* Navigation */}
       <nav
-        className={`flex gap-1 sm:gap-2 mb-6 sm:mb-8 p-1 sm:p-1.5 rounded-2xl w-full max-w-5xl transition-colors overflow-x-auto no-scrollbar scroll-smooth border ${
-          isDark ? "bg-slate-900 border-slate-800" : "bg-slate-200/50 border-slate-300/50"
-        }`}
+        className="flex gap-1 sm:gap-2 mb-6 sm:mb-8 p-1 sm:p-1.5 rounded-2xl w-full max-w-5xl transition-colors overflow-x-auto no-scrollbar scroll-smooth border bg-slate-200/50 border-slate-300/50 dark:bg-slate-900 dark:border-slate-800"
       >
         {(
           [
@@ -217,9 +189,7 @@ const App: React.FC = () => {
             aria-current={view === nav.id ? "page" : undefined}
             className={`flex-1 min-w-0 sm:min-w-[100px] flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 min-h-11 py-1.5 sm:py-3 rounded-xl transition-all font-bold text-xs sm:text-[13px] tracking-wide sm:tracking-widest cursor-pointer ${
               view === nav.id
-                ? isDark
-                  ? "bg-slate-700 shadow-lg text-white border border-slate-600"
-                  : "bg-white shadow-md text-slate-900 border border-slate-200"
+                ? "bg-white shadow-md text-slate-900 border border-slate-200 dark:bg-slate-700 dark:shadow-lg dark:text-white dark:border-slate-600"
                 : "opacity-70 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5 border border-transparent"
             }`}
           >
@@ -236,21 +206,19 @@ const App: React.FC = () => {
             emotion={currentEmotion}
             isSpinning={isSpinning}
             lang={lang}
-            isDark={isDark}
             onShuffle={handleShuffle}
             onOpenEmotion={openEmotion}
           />
         )}
         {view === "dyads" && (
-          <DyadsView pair={dyadPair} lang={lang} isDark={isDark} onRandomPair={handleRandomDyad} />
+          <DyadsView pair={dyadPair} lang={lang} onRandomPair={handleRandomDyad} />
         )}
         {view === "catalog" && (
-          <CatalogView lang={lang} isDark={isDark} onOpenEmotion={openEmotion} />
+          <CatalogView lang={lang} onOpenEmotion={openEmotion} />
         )}
         {view === "manifesto" && (
           <TheoryView
             lang={lang}
-            isDark={isDark}
             onGoTo={goTo}
             onDraw={() => { goTo("shuffle"); handleShuffle() }}
           />
@@ -261,7 +229,6 @@ const App: React.FC = () => {
         <EmotionModal
           emotion={selectedEmotion}
           lang={lang}
-          isDark={isDark}
           onClose={closeModal}
           openerRef={openerRef}
           scrollToBodyDictRef={scrollToBodyDictRef}

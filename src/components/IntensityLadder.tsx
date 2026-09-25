@@ -3,10 +3,10 @@ import { uiTranslations } from "../tresc/interfejs"
 import type { Emotion, Lang } from "../tresc/typy"
 
 // Drabina intensywności: od słabej (Sygnał) do skrajnej (Afekt) wersji emocji
-export const IntensityLadder = ({ emotion, lang, isDark }: { emotion: Emotion, lang: Lang, isDark: boolean }) => {
+export const IntensityLadder = ({ emotion, lang }: { emotion: Emotion, lang: Lang }) => {
   const t = uiTranslations[lang].modal
   return (
-    <div className={`p-5 rounded-xl border relative overflow-hidden ${isDark ? "bg-slate-900 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
+    <div className="p-5 rounded-xl border relative overflow-hidden bg-white border-slate-200 not-dark:shadow-sm dark:bg-slate-900 dark:border-slate-700">
         <h3 className="text-xs font-bold uppercase tracking-widest opacity-60 mb-5 flex items-center gap-2">
             <BarChart2 size={16} /> {t.energyScale}
         </h3>
@@ -21,7 +21,7 @@ export const IntensityLadder = ({ emotion, lang, isDark }: { emotion: Emotion, l
                 <div key={row.label} className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-y-1.5">
                     <span className="text-xs opacity-60 sm:w-24 sm:shrink-0 font-medium">{row.label}</span>
                     <span className={`text-sm text-right sm:w-32 sm:shrink-0 sm:order-3 ${row.text}`}>{row.name}</span>
-                    <div className={`basis-full sm:basis-auto sm:flex-1 sm:mx-3 sm:order-2 h-2 rounded-full overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
+                    <div className={`basis-full sm:basis-auto sm:flex-1 sm:mx-3 sm:order-2 h-2 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800`}>
                         <div className={`h-full bg-current ${row.bar} ${emotion.colorClass}`}></div>
                     </div>
                 </div>

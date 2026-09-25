@@ -8,7 +8,8 @@ import type { Emotion } from "./typy"
 //   Mechanizm_Powstawania_Emocji_Teksty_do_modali.md),
 // - intensity — drabina od słabej do skrajnej wersji,
 // - signals — Słownik Ciała (8 sygnałów).
-// Klasy kolorów (colorClass itd.) to nazwy klas Tailwinda — muszą być wpisane w całości.
+// Klasy kolorów to nazwy klas Tailwinda — muszą być wpisane w całości (Tailwind szuka ich w tekście
+// plików). colorClass = kolor ikony i pasków, nameClass = kolor nazwy emocji w trybie jasnym i ciemnym.
 export const EMOTIONS: Emotion[] = [
   {
     id: "JOY",
@@ -68,7 +69,7 @@ export const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-yellow-500",
-    textLightClass: "text-yellow-700",
+    nameClass: "text-yellow-700 dark:text-yellow-500",
     bgLightClass: "bg-yellow-500/10",
     hex: "#eab308",
     icon: Sun,
@@ -131,7 +132,7 @@ export const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-lime-500",
-    textLightClass: "text-lime-700",
+    nameClass: "text-lime-700 dark:text-lime-500",
     bgLightClass: "bg-lime-500/10",
     hex: "#84cc16",
     icon: UserCheck,
@@ -194,7 +195,7 @@ export const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-emerald-500",
-    textLightClass: "text-emerald-700",
+    nameClass: "text-emerald-700 dark:text-emerald-500",
     bgLightClass: "bg-emerald-500/10",
     hex: "#10b981",
     icon: AlertTriangle,
@@ -257,7 +258,7 @@ export const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-cyan-500",
-    textLightClass: "text-cyan-700",
+    nameClass: "text-cyan-700 dark:text-cyan-500",
     bgLightClass: "bg-cyan-500/10",
     hex: "#06b6d4",
     icon: Maximize2,
@@ -320,7 +321,7 @@ export const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-blue-500",
-    textLightClass: "text-blue-700",
+    nameClass: "text-blue-700 dark:text-blue-500",
     bgLightClass: "bg-blue-500/10",
     hex: "#3b82f6",
     icon: Anchor,
@@ -383,7 +384,7 @@ export const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-purple-500",
-    textLightClass: "text-purple-700",
+    nameClass: "text-purple-700 dark:text-purple-500",
     bgLightClass: "bg-purple-500/10",
     hex: "#a855f7",
     icon: MinusCircle,
@@ -446,7 +447,7 @@ export const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-red-500",
-    textLightClass: "text-red-700",
+    nameClass: "text-red-700 dark:text-red-500",
     bgLightClass: "bg-red-500/10",
     hex: "#ef4444",
     icon: Flame,
@@ -509,7 +510,7 @@ export const EMOTIONS: Emotion[] = [
       ]
     },
     colorClass: "text-orange-500",
-    textLightClass: "text-orange-700",
+    nameClass: "text-orange-700 dark:text-orange-500",
     bgLightClass: "bg-orange-500/10",
     hex: "#f97316",
     icon: EyeIcon,

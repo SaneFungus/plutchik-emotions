@@ -27,7 +27,7 @@ export interface Emotion {
   vector: L
   signals: { pl: string[]; en: string[] }
   colorClass: string
-  textLightClass: string
+  nameClass: string
   bgLightClass: string
   hex: string
   icon: ElementType
