@@ -11,7 +11,7 @@ import {
   Target,
   AlertTriangle,
   Flame,
-  Zap,
+  Sun,
   Anchor,
   UserCheck,
   MinusCircle,
@@ -49,7 +49,6 @@ const uiTranslations = {
       actorPerspective: "Perspektywa Aktora",
       bodySignal: "Sygnał z ciała (Co czuję?)",
       scenicGoal: "Cel sceniczny (Zadanie)",
-      remember: "Pamiętaj: Ciało nie kłamie. Zagraj impuls (napięcie/rozluźnienie), a emocja pojawi się sama.",
       back: "Zamknij",
       stimulus: "Bodziec",
       impulse: "Impuls",
@@ -83,7 +82,6 @@ const uiTranslations = {
       actorPerspective: "Actor's Perspective",
       bodySignal: "Body Signal (What do I feel?)",
       scenicGoal: "Scenic Goal (Task)",
-      remember: "Remember: The body doesn't lie. Play the impulse, and the emotion will appear by itself.",
       back: "Close",
       stimulus: "Stimulus",
       impulse: "Impulse",
@@ -166,7 +164,7 @@ const EMOTIONS: Emotion[] = [
     textLightClass: "text-yellow-700",
     bgLightClass: "bg-yellow-500/10",
     hex: "#eab308",
-    icon: Zap,
+    icon: Sun,
   },
   {
     id: "TRUST",
@@ -1033,8 +1031,12 @@ const App: React.FC = () => {
   const openerRef = useRef<HTMLElement | null>(null)
   const closeBtnRef = useRef<HTMLButtonElement>(null)
 
-  const openEmotion = (item: Emotion, opener: HTMLElement) => {
+  const bodyDictRef = useRef<HTMLDivElement>(null)
+  const scrollToBodyDictRef = useRef(false)
+
+  const openEmotion = (item: Emotion, opener: HTMLElement, toBodyDict = false) => {
     openerRef.current = opener
+    scrollToBodyDictRef.current = toBodyDict
     setSelectedEmotion(item)
   }
 
@@ -1055,6 +1057,10 @@ const App: React.FC = () => {
     if (dialog && !dialog.open) {
       dialog.showModal()
       closeBtnRef.current?.focus() // inaczej przeglądarka fokusuje przewijany kontener
+    }
+    if (scrollToBodyDictRef.current) {
+      scrollToBodyDictRef.current = false
+      bodyDictRef.current?.scrollIntoView({ block: "start" })
     }
     if (!window.history.state?.plutchikModal) window.history.pushState({ plutchikModal: true }, "")
     const onPop = () => setSelectedEmotion(null)
@@ -1183,13 +1189,22 @@ const App: React.FC = () => {
                   : "bg-white border-slate-100 shadow-2xl shadow-slate-300/50"
               } ${currentEmotion.colorClass} ${isSpinning ? "animate-roulette" : ""}`}
             >
-              <div className="relative z-10 drop-shadow-md">
+              {/* Ikona otwiera okno emocji od razu na "Słowniku Ciała" */}
+              <button
+                type="button"
+                onClick={(e) => openEmotion(currentEmotion, e.currentTarget, true)}
+                disabled={isSpinning}
+                aria-label={`${t.modal.bodyDictionary}: ${currentEmotion.name[lang]}`}
+                title={t.modal.bodyDictionary}
+                className="relative z-10 drop-shadow-md rounded-full p-2 cursor-pointer transition-transform hover:scale-110 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current disabled:cursor-default disabled:hover:scale-100"
+              >
                 <currentEmotion.icon strokeWidth={1.5} className="w-24 h-24 sm:w-32 sm:h-32" />
-              </div>
+              </button>
             </div>
 
             <div className="text-center mb-6 sm:mb-8 w-full transition-opacity duration-300" style={{ opacity: isSpinning ? 0 : 1 }}>
-              <h2 className={`text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter mb-2 sm:mb-3 ${nameColor(currentEmotion)}`}>
+              {/* font-black to już najgrubsza waga kroju — obrys w kolorze tekstu pogrubia litery dalej */}
+              <h2 className={`text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight mb-2 sm:mb-3 [-webkit-text-stroke:1px_currentColor] sm:[-webkit-text-stroke:1.5px_currentColor] ${nameColor(currentEmotion)}`}>
                 {currentEmotion.name[lang]}
               </h2>
               <p className={`text-sm sm:text-base md:text-lg leading-tight font-medium mb-6 opacity-80`}>
@@ -1615,7 +1630,7 @@ const App: React.FC = () => {
                   </div>
                 </div>
 
-                <div className={`p-6 sm:p-8 rounded-xl border h-full ${isDark ? "bg-slate-900 border-slate-700" : "bg-white border-slate-200 shadow-md"}`}>
+                <div ref={bodyDictRef} className={`p-6 sm:p-8 rounded-xl border h-full scroll-mt-28 sm:scroll-mt-36 ${isDark ? "bg-slate-900 border-slate-700" : "bg-white border-slate-200 shadow-md"}`}>
                     <h3 className="text-lg font-bold flex items-center gap-2 mb-2">
                         <Fingerprint size={20} className="text-teal-500" /> {t.modal.bodyDictionary}
                     </h3>
@@ -1643,11 +1658,6 @@ const App: React.FC = () => {
                           <span className="text-xs uppercase font-bold opacity-70 block mb-1">{t.modal.scenicGoal}</span>
                           <p className="text-sm font-medium">{selectedEmotion.desc[lang]}</p>
                       </div>
-                      <div className={`flex-1 md:pl-6 flex items-center md:border-l ${isDark ? 'border-slate-700' : 'border-slate-300'}`}>
-                          <p className="text-xs italic opacity-70">
-                              {t.modal.remember}
-                          </p>
-                      </div>
                   </div>
               </div>
             </div>
@@ -1657,16 +1667,6 @@ const App: React.FC = () => {
 
       {/* Footer */}
       <footer className="mt-6 sm:mt-8 text-center w-full max-w-md pb-6 sm:pb-8 flex flex-col items-center gap-4">
-        <div
-          className={`text-xs font-mono px-3 py-1.5 sm:px-4 sm:py-2 rounded border inline-block ${
-            isDark ? "border-slate-800 text-slate-500 bg-slate-900/50" : "border-slate-300 text-slate-500 bg-white"
-          }`}
-        >
-          {lang === "pl" ? "MODEL TRÓJWYMIAROWY:" : "3D MODEL:"}
-          <span className="ml-1 opacity-80 break-words font-bold">
-            {lang === "pl" ? "Intensywność, Podobieństwo, Przeciwieństwo." : "Intensity, Similarity, Polarity."}
-          </span>
-        </div>
         
         <div className="text-xs opacity-70 hover:opacity-100 transition-opacity text-center mt-2 max-w-md leading-relaxed">
           {lang === "pl" ? (
