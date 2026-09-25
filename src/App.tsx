@@ -358,7 +358,7 @@ const EMOTIONS: Emotion[] = [
     action: { pl: "WYPYCHANIE / PLUCIE", en: "PUSHING AWAY / SPITTING" },
     function: { pl: "ODRZUCENIE", en: "REJECTION" },
     intensity: {
-      low: { pl: "Niechęć", en: "Boredom" },
+      low: { pl: "Nuda", en: "Boredom" },
       medium: { pl: "Wstręt", en: "Disgust" },
       high: { pl: "Odraza", en: "Loathing" }
     },
@@ -382,7 +382,7 @@ const EMOTIONS: Emotion[] = [
         "Covering mouth or nose with hand",
         "Gag reflex, swallowing saliva",
         "Retracting torso (leaning back)",
-        "Purging lips (blocking entry)"
+        "Pressing lips together (blocking entry)"
       ]
     },
     colorClass: "text-purple-500",
@@ -788,7 +788,7 @@ const getDyad = (e1Id: string, e2Id: string): DyadResult | null => {
     "FEAR+SURPRISE": { name: { pl: "Poruszenie", en: "Alarm" }, type: "primary" },
     "SADNESS+SURPRISE": { name: { pl: "Rozczarowanie", en: "Disappointment" }, type: "primary" },
     "DISGUST+SADNESS": { name: { pl: "Żal", en: "Remorse" }, type: "primary" },
-    "ANGER+DISGUST": { name: { pl: "Zawiść", en: "Contempt/Envy" }, type: "primary" },
+    "ANGER+DISGUST": { name: { pl: "Pogarda", en: "Contempt" }, type: "primary" },
     "ANGER+ANTICIPATION": { name: { pl: "Agresja", en: "Aggression" }, type: "primary" },
     "ANTICIPATION+JOY": { name: { pl: "Optymizm", en: "Optimism" }, type: "primary" },
     "FEAR+JOY": { name: { pl: "Poczucie winy", en: "Guilt" }, type: "secondary" },
