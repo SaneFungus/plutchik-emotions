@@ -1105,7 +1105,7 @@ const App: React.FC = () => {
                     <ul className="space-y-3">
                         {selectedEmotion.signals[lang].map((signal, idx) => (
                             <li key={idx} className="flex gap-3 text-sm items-start">
-                                <span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${selectedEmotion.colorClass.replace('text-', 'bg-')}`}></span>
+                                <span className="mt-1.5 w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: selectedEmotion.hex }}></span>
                                 <span className="opacity-90">{signal}</span>
                             </li>
                         ))}
