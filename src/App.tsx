@@ -522,6 +522,17 @@ const getDyad = (e1Id: string, e2Id: string): DyadResult | null => {
   return dyads[pair] || null
 }
 
+// Krycie przedniego kola w diadzie (zmierzone na wzorcu: ok. 70%)
+const DYAD_ALPHA = 0.7
+
+// Kolor `top` o kryciu `alpha` polozony na kolorze `base` (zwykla przezroczystosc)
+const mixHex = (base: string, top: string, alpha: number) => {
+  const ch = (hex: string, i: number) => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16)
+  return "#" + [0, 1, 2]
+    .map(i => Math.round(ch(base, i) * (1 - alpha) + ch(top, i) * alpha).toString(16).padStart(2, "0"))
+    .join("")
+}
+
 // ─── Sub-components ───────────────────────────────────────────────
 
 const EvoChain = ({ emotion, lang, isDark }: { emotion: Emotion, lang: 'pl'|'en', isDark: boolean }) => {
@@ -848,19 +859,28 @@ const App: React.FC = () => {
                 <p className="text-xs sm:text-sm opacity-60 leading-relaxed px-4">{t.dyadsDesc}</p>
               </div>
 
-              <div className="flex justify-center items-center mb-8 sm:mb-12 relative h-40 sm:h-56 w-full max-w-[16rem] sm:max-w-sm mx-auto">
-                {/* Warstwa koloru: dwa pelne, nasycone kola. `isolation: isolate` sprawia, ze
-                    mnozenie (multiply) dziala tylko miedzy kolami — czesc wspolna robi sie
-                    ciemniejsza mieszanka obu barw, a tlo strony (jasne czy ciemne) nie brudzi kolorow. */}
-                <div className="absolute inset-0" style={{ isolation: "isolate" }} aria-hidden="true">
+              <div className="flex justify-center items-center mb-8 sm:mb-12 relative h-40 sm:h-56 w-64 sm:w-96 mx-auto">
+                {/* Warstwa koloru — zasada "kalki": przednie kolo to kolor emocji o kryciu 70%.
+                    Kolory liczymy tak, jakby pod spodem zawsze bylo biale tlo, i malujemy je
+                    jako pelne, zeby w trybie ciemnym granat strony nie przeswitywal:
+                    - tylne kolo: kolor emocji,
+                    - przednie kolo: 70% koloru emocji + 30% bieli (jasniejszy odcien),
+                    - czesc wspolna: 70% przedniego koloru + 30% tylnego. */}
+                <div className="absolute inset-0" aria-hidden="true">
                   <div
                     className="absolute left-0 w-40 h-40 sm:w-56 sm:h-56 rounded-full transition-colors duration-500"
                     style={{ backgroundColor: dyadPair[0].hex }}
                   />
                   <div
-                    className="absolute right-0 w-40 h-40 sm:w-56 sm:h-56 rounded-full transition-colors duration-500"
-                    style={{ backgroundColor: dyadPair[1].hex, opacity: 0.85, mixBlendMode: "multiply" }}
-                  />
+                    className="absolute right-0 w-40 h-40 sm:w-56 sm:h-56 rounded-full overflow-hidden transition-colors duration-500"
+                    style={{ backgroundColor: mixHex("#ffffff", dyadPair[1].hex, DYAD_ALPHA) }}
+                  >
+                    {/* Kopia tylnego kola w pozycji tylnego kola, przycieta do przedniego = czesc wspolna */}
+                    <div
+                      className="absolute top-0 -left-24 sm:-left-40 w-40 h-40 sm:w-56 sm:h-56 rounded-full transition-colors duration-500"
+                      style={{ backgroundColor: mixHex(dyadPair[0].hex, dyadPair[1].hex, DYAD_ALPHA) }}
+                    />
+                  </div>
                 </div>
 
                 {/* Warstwa tresci: ikona i nazwa nad kolorem, bez mieszania */}
