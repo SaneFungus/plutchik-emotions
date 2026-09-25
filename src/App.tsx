@@ -849,37 +849,35 @@ const App: React.FC = () => {
               </div>
 
               <div className="flex justify-center items-center mb-8 sm:mb-12 relative h-40 sm:h-56 w-full max-w-[16rem] sm:max-w-sm mx-auto">
-                {/* Emotion 1 */}
-                <div
-                  className={`absolute left-0 w-40 h-40 sm:w-56 sm:h-56 rounded-full flex flex-col items-center justify-center p-4 shadow-xl border-4 sm:border-8 mix-blend-multiply dark:mix-blend-screen transition-all duration-500 ${
-                    isDark ? "border-slate-950 bg-slate-900" : "border-slate-50 bg-white"
-                  }`}
-                  style={{ zIndex: 2 }}
-                >
-                  <div className={`absolute inset-0 rounded-full opacity-60 ${dyadPair[0].bgLightClass}`} />
-                  <div className="relative z-10 flex flex-col items-center">
-                    <Icon1 className={`w-12 h-12 sm:w-16 sm:h-16 mb-2 sm:mb-3 ${dyadPair[0].colorClass}`} strokeWidth={1.5} />
-                    <h3 className={`text-sm sm:text-xl font-black uppercase tracking-tight text-center ${nameColor(dyadPair[0])}`}>
-                      {dyadPair[0].name[lang]}
-                    </h3>
-                  </div>
+                {/* Warstwa koloru: dwa pelne, nasycone kola. `isolation: isolate` sprawia, ze
+                    mnozenie (multiply) dziala tylko miedzy kolami — czesc wspolna robi sie
+                    ciemniejsza mieszanka obu barw, a tlo strony (jasne czy ciemne) nie brudzi kolorow. */}
+                <div className="absolute inset-0" style={{ isolation: "isolate" }} aria-hidden="true">
+                  <div
+                    className="absolute left-0 w-40 h-40 sm:w-56 sm:h-56 rounded-full transition-colors duration-500"
+                    style={{ backgroundColor: dyadPair[0].hex }}
+                  />
+                  <div
+                    className="absolute right-0 w-40 h-40 sm:w-56 sm:h-56 rounded-full transition-colors duration-500"
+                    style={{ backgroundColor: dyadPair[1].hex, opacity: 0.85, mixBlendMode: "multiply" }}
+                  />
                 </div>
 
-                {/* Emotion 2 */}
-                <div
-                  className={`absolute right-0 w-40 h-40 sm:w-56 sm:h-56 rounded-full flex flex-col items-center justify-center p-4 shadow-xl border-4 sm:border-8 mix-blend-multiply dark:mix-blend-screen transition-all duration-500 ${
-                    isDark ? "border-slate-950 bg-slate-900" : "border-slate-50 bg-white"
-                  }`}
-                  style={{ zIndex: 1 }}
-                >
-                  <div className={`absolute inset-0 rounded-full opacity-60 ${dyadPair[1].bgLightClass}`} />
-                  <div className="relative z-10 flex flex-col items-center">
-                    <Icon2 className={`w-12 h-12 sm:w-16 sm:h-16 mb-2 sm:mb-3 ${dyadPair[1].colorClass}`} strokeWidth={1.5} />
-                    <h3 className={`text-sm sm:text-xl font-black uppercase tracking-tight text-center ${nameColor(dyadPair[1])}`}>
-                      {dyadPair[1].name[lang]}
-                    </h3>
-                  </div>
-                </div>
+                {/* Warstwa tresci: ikona i nazwa nad kolorem, bez mieszania */}
+                {[dyadPair[0], dyadPair[1]].map((e, i) => {
+                  const Icon = i === 0 ? Icon1 : Icon2
+                  return (
+                    <div
+                      key={i}
+                      className={`absolute ${i === 0 ? "left-0" : "right-0"} w-40 h-40 sm:w-56 sm:h-56 flex flex-col items-center justify-center p-4 text-slate-950`}
+                    >
+                      <Icon className="w-12 h-12 sm:w-16 sm:h-16 mb-2 sm:mb-3" strokeWidth={1.5} />
+                      <h3 className="text-sm sm:text-xl font-black uppercase tracking-tight text-center">
+                        {e.name[lang]}
+                      </h3>
+                    </div>
+                  )
+                })}
               </div>
 
               {/* Result */}
