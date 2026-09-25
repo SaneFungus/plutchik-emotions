@@ -77,8 +77,8 @@ export const THEORY = {
           en: "8 basic ones; everything else — jealousy, nostalgia — is a combination.",
         },
         stage: {
-          pl: "Skomplikowana postać to nie osobna, tajemnicza emocja do odkrycia — to zwykle dwie znane ci już emocje, zmieszane w niewłaściwych proporcjach.",
-          en: "A complicated character isn't some separate, mysterious emotion to discover — it's usually two emotions you already know, mixed in the wrong proportions.",
+          pl: "Skomplikowana postać to nie osobna, tajemnicza emocja do odkrycia — to zwykle dwie znane ci już emocje, zmieszane w różnych proporcjach.",
+          en: "A complicated character isn't some separate, mysterious emotion to discover — it's usually two emotions you already know, mixed in the different proportions.",
         },
         link: { view: "dyads", label: { pl: "Zobacz Diady", en: "See the Dyads" } },
       },
