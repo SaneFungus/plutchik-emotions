@@ -6,7 +6,6 @@ import {
   EyeOff,
   BookOpen,
   LayoutGrid,
-  HeartPulse,
   Layers,
   Activity,
   Target,
@@ -23,6 +22,8 @@ import {
   BarChart2,
   ArrowRight,
   ArrowDown,
+  ChevronDown,
+  Drama,
   X
 } from "lucide-react"
 
@@ -57,7 +58,9 @@ const uiTranslations = {
       bioGoal: "Cel Biologiczny",
       energyScale: "Skala Energii (Intensywność)",
       affect: "Afekt",
-      signal: "Sygnał"
+      signal: "Sygnał",
+      mechanismHint: "Dotknij etapu, żeby zobaczyć, co dzieje się w tej emocji.",
+      next: "Dalej"
     }
   },
   en: {
@@ -89,7 +92,9 @@ const uiTranslations = {
       bioGoal: "Biological Goal",
       energyScale: "Energy Scale (Intensity)",
       affect: "Affect",
-      signal: "Signal"
+      signal: "Signal",
+      mechanismHint: "Tap a stage to see what happens in this emotion.",
+      next: "Next"
     }
   }
 }
@@ -480,6 +485,296 @@ const EMOTIONS: Emotion[] = [
   },
 ]
 
+// ─── Mechanizm Powstawania: wyjaśnienia etapów łańcucha ─────────────
+// Źródło: Mechanizm_Powstawania_Emocji_Teksty_do_modali.md (etap "Emocja" pomijamy — to nazwa karty)
+type MechanismStep = "stimulus" | "impulse" | "action" | "function"
+const MECHANISM_STEPS: MechanismStep[] = ["stimulus", "impulse", "action", "function"]
+
+const MECHANISM: Record<string, Record<MechanismStep, { pl: string; en: string }>> = {
+  JOY: {
+    stimulus: {
+      pl: "Twój mózg wykrył, że sytuacja jest bezpieczna i korzystna — zdobyłeś coś (uwagę, nagrodę, przewagę) albo zagrożenie właśnie minęło. To sygnał „mam nadmiar” wysyłany przez otoczenie, zanim jeszcze poczujesz samą emocję.",
+      en: "Your brain has detected that the situation is safe and advantageous — you've gained something (attention, a reward, an edge), or a threat has just passed. It's an “I have surplus” signal from the environment, arriving before you even feel the emotion.",
+    },
+    impulse: {
+      pl: "Ciało reaguje pierwsze: mięśnie się rozluźniają, klatka piersiowa się otwiera, pojawia się nadmiar energii, który trzeba gdzieś wyładować. To fizjologiczny „wydech ulgi”, domagający się ruchu na zewnątrz i w górę — stąd chęć śmiechu, podskoku, gestykulacji.",
+      en: "The body reacts first: muscles loosen, the chest opens, and a surplus of energy appears that needs an outlet. It's the physiological “exhale of relief” that demands movement outward and upward — hence the urge to laugh, jump, or gesture.",
+    },
+    action: {
+      pl: "Nadmiar energii zamienia się w konkretne zachowanie: chcesz być widziany. Głośniejszy śmiech, szersze gesty, opowiadanie o sukcesie — to sygnał do grupy: „jestem silny/atrakcyjny, zbliż się do mnie”.",
+      en: "The surplus energy turns into concrete behavior: you want to be seen. Louder laughter, bigger gestures, talking about your win — a signal to the group: “I'm strong and attractive, come closer.”",
+    },
+    function: {
+      pl: "Ewolucyjnie radość istnieje po to, by demonstrować kondycję i zasoby potencjalnym partnerom i sojusznikom. To emocja, która buduje więzi, przyciąga innych i utrwala zachowania prowadzące do sukcesu.",
+      en: "Evolutionarily, joy exists to display fitness and resources to potential partners and allies. It's the emotion that builds bonds, attracts others, and reinforces the behaviors that led to success.",
+    },
+  },
+  TRUST: {
+    stimulus: {
+      pl: "Organizm rozpoznaje osobę lub sytuację jako nieszkodliwą — kogoś „ze swojego plemienia”. To ocena bezpieczeństwa dokonywana zanim świadomie zdecydujesz, że możesz komuś zaufać.",
+      en: "The organism recognizes a person or situation as harmless — someone “from your own tribe.” It's a safety assessment made before you consciously decide you can trust someone.",
+    },
+    impulse: {
+      pl: "Napięcie obronne opada, mięśnie twarzy i ciała się rozluźniają, oddech zwalnia. Pojawia się ciepło i chęć zbliżenia — ciało otwiera się, zamiast się bronić.",
+      en: "Defensive tension drops, facial and body muscles relax, breathing slows. Warmth appears along with a pull toward closeness — the body opens instead of guarding itself.",
+    },
+    action: {
+      pl: "Rozluźnienie zamienia się w konkretny gest: odsłaniasz wrażliwe miejsca (szyję, dłonie), pochylasz się w stronę drugiej osoby, synchronizujesz z nią ruchy. To fizyczna zgoda na bliskość.",
+      en: "Relaxation turns into a concrete gesture: you expose vulnerable spots (neck, palms), lean toward the other person, sync your movements with theirs. It's physical consent to closeness.",
+    },
+    function: {
+      pl: "Zaufanie istnieje po to, by umożliwić współpracę i budowanie trwałych relacji — bez niego niemożliwa byłaby ani opieka nad potomstwem, ani życie w grupie.",
+      en: "Trust exists to make cooperation and lasting relationships possible — without it, neither caring for offspring nor living in a group would be possible.",
+    },
+  },
+  FEAR: {
+    stimulus: {
+      pl: "Ciało wykrywa siłę większą od siebie — coś, co może je zranić lub zniszczyć. Ocena zagrożenia zachodzi błyskawicznie, zanim zdołasz nazwać, co właściwie się dzieje.",
+      en: "The body detects a force greater than itself — something that could hurt or destroy it. The threat assessment happens instantly, before you can even name what's happening.",
+    },
+    impulse: {
+      pl: "Serce przyspiesza, oddech płycieje, krew odpływa z kończyn do organów życiowych. Ciało mobilizuje się do jednej z dwóch opcji: uciec albo zamarznąć w bezruchu.",
+      en: "The heart races, breathing shallows, blood drains from the limbs toward vital organs. The body mobilizes for one of two options: flee, or freeze in stillness.",
+    },
+    action: {
+      pl: "Napięcie rozładowuje się przez oddalenie od źródła zagrożenia — dosłowną ucieczkę, cofnięcie się, unik albo skulenie osłaniające szyję i brzuch.",
+      en: "The tension discharges through distancing from the source of danger — literal flight, stepping back, avoidance, or crouching to shield the neck and belly.",
+    },
+    function: {
+      pl: "Strach istnieje po to, by chronić integralność ciała przed zniszczeniem. To najstarszy i najszybszy mechanizm przetrwania — działa, zanim jeszcze pomyślisz.",
+      en: "Fear exists to protect the body's integrity from destruction. It's the oldest and fastest survival mechanism — it acts before you even think.",
+    },
+  },
+  SURPRISE: {
+    stimulus: {
+      pl: "Coś pojawia się w polu uwagi bez ostrzeżenia — dźwięk, ruch, informacja, której się nie spodziewałeś. Umysł nie ma jeszcze gotowej kategorii, do której mógłby to przypisać.",
+      en: "Something appears in your field of attention without warning — a sound, a movement, information you didn't expect. The mind doesn't yet have a ready category to file it under.",
+    },
+    impulse: {
+      pl: "Wszystko na chwilę się zatrzymuje: gwałtowny, krótki wdech, bezruch, szeroko otwarte oczy. To „biała karta” — ciało kasuje bieżące działanie, by w pełni przyjąć nowy bodziec.",
+      en: "Everything stops for a moment: a sudden, sharp inhale, stillness, wide-open eyes. It's a “blank slate” — the body cancels its current action to fully take in the new stimulus.",
+    },
+    action: {
+      pl: "Zatrzymanie zamienia się w krótki reset uwagi: cofnięcie się, podniesienie dłoni do twarzy, moment całkowitego bezruchu, zanim ciało zdecyduje, co dalej.",
+      en: "The freeze turns into a brief reset of attention: stepping back, raising a hand to the face, a moment of total stillness before the body decides what comes next.",
+    },
+    function: {
+      pl: "Zaskoczenie istnieje po to, by szybko przekierować całą uwagę na nowy, potencjalnie ważny element otoczenia — zanim zdążysz go zignorować.",
+      en: "Surprise exists to quickly redirect your entire attention to a new, potentially important element of the environment — before you can ignore it.",
+    },
+  },
+  SADNESS: {
+    stimulus: {
+      pl: "Coś ważnego zniknęło bezpowrotnie — osoba, szansa, status, złudzenie. Sytuacji nie da się już naprawić działaniem, więc organizm przestawia się na inny tryb.",
+      en: "Something important is gone for good — a person, a chance, a status, an illusion. The situation can no longer be fixed by action, so the organism switches to a different mode.",
+    },
+    impulse: {
+      pl: "Ciało robi się ciężkie, klatka piersiowa zapada się do wewnątrz, energia opada. To fizjologiczne wyciszenie — organizm oszczędza siły zamiast walczyć o coś, czego już nie ma.",
+      en: "The body feels heavy, the chest caves inward, energy drops. It's a physiological shutdown — the organism conserves strength instead of fighting for something that's already gone.",
+    },
+    action: {
+      pl: "Opadająca energia wychodzi na zewnątrz jako łzy, spowolniony głos, znieruchomienie. To zarazem rozładowanie napięcia i czytelny sygnał dla innych: „potrzebuję pomocy”.",
+      en: "The dropping energy surfaces as tears, a slowed voice, stillness. It's both a release of tension and a clear signal to others: “I need help.”",
+    },
+    function: {
+      pl: "Smutek istnieje po to, by przyciągnąć wsparcie grupy i dać czas na przetworzenie straty, zanim organizm na nowo zaangażuje się w życie.",
+      en: "Sadness exists to draw the group's support and to allow time to process the loss before the organism re-engages with life.",
+    },
+  },
+  DISGUST: {
+    stimulus: {
+      pl: "Organizm wykrywa coś potencjalnie szkodliwego — zepsute jedzenie, ale też zachowanie łamiące normy moralne. Mózg traktuje „moralny brud” tym samym mechanizmem, co fizyczną truciznę.",
+      en: "The organism detects something potentially harmful — spoiled food, but also behavior that breaks moral norms. The brain treats “moral filth” with the very same mechanism as physical poison.",
+    },
+    impulse: {
+      pl: "Żołądek się kurczy, pojawia się odruch mdłości, twarz automatycznie się marszczy, by zmniejszyć pole oddychania i widzenia — ciało próbuje odciąć się od kontaktu z bodźcem.",
+      en: "The stomach contracts, a nauseous reflex appears, the face automatically wrinkles to reduce breathing and viewing exposure — the body tries to cut off contact with the stimulus.",
+    },
+    action: {
+      pl: "Skurcz zamienia się w gest odrzucenia: odwrócenie głowy, zasłonięcie ust lub nosa, cofnięcie tułowia, a w skrajnym przypadku — dosłowne wypluwanie czy wymioty.",
+      en: "The contraction turns into a gesture of rejection: turning the head away, covering the mouth or nose, pulling the torso back, or in extreme cases, literal spitting or vomiting.",
+    },
+    function: {
+      pl: "Wstręt istnieje po to, by chronić organizm i grupę przed skażeniem — fizycznym (choroby, trucizny) i społecznym (zachowania niszczące wspólnotę).",
+      en: "Disgust exists to protect the organism and the group from contamination — physical (disease, poison) and social (behavior that undermines the community).",
+    },
+  },
+  ANGER: {
+    stimulus: {
+      pl: "Coś blokuje realizację celu, ale organizm ocenia, że ma dość siły, by to pokonać. To kluczowa różnica względem strachu: tu przeszkoda wydaje się możliwa do przebicia.",
+      en: "Something is blocking a goal, but the organism assesses it has enough strength to overcome it. This is the key difference from fear: here the obstacle seems possible to break through.",
+    },
+    impulse: {
+      pl: "Krew napływa do rąk i twarzy, temperatura ciała rośnie, mięśnie się napinają. Adrenalina mobilizuje całe ciało do jednego zadania: przebicia się przez przeszkodę.",
+      en: "Blood rushes to the hands and face, body temperature rises, muscles tense. Adrenaline mobilizes the whole body for one task: breaking through the obstacle.",
+    },
+    action: {
+      pl: "Napięcie wyładowuje się do przodu: zaciśnięte pięści, wysunięta żuchwa, podniesiony głos, fizyczny nacisk na przeszkodę lub osobę, która ją reprezentuje.",
+      en: "The tension discharges forward: clenched fists, a jutting jaw, a raised voice, physical pressure on the obstacle or the person who represents it.",
+    },
+    function: {
+      pl: "Gniew istnieje po to, by usuwać przeszkody stojące na drodze do zasobów lub bezpieczeństwa — to energia mobilizacji, nie zawsze przemocy.",
+      en: "Anger exists to remove obstacles standing in the way of resources or safety — it's mobilizing energy, not always violence.",
+    },
+  },
+  ANTICIPATION: {
+    stimulus: {
+      pl: "Organizm wchodzi w sytuację z niepewnym wynikiem — coś ważnego może się wydarzyć, ale jeszcze nie wiadomo co. Brak informacji sam w sobie staje się bodźcem.",
+      en: "The organism enters a situation with an uncertain outcome — something important may happen, but it's not yet clear what. The lack of information itself becomes the stimulus.",
+    },
+    impulse: {
+      pl: "Źrenice się rozszerzają, mięśnie lekko napinają w gotowości do ruchu, uwaga zawęża się do jednego punktu. Ciało przygotowuje się, by błyskawicznie zareagować na to, co nadejdzie.",
+      en: "Pupils dilate, muscles tense slightly in readiness to move, attention narrows to a single point. The body prepares to react instantly to whatever comes next.",
+    },
+    action: {
+      pl: "Napięcie zamienia się w aktywne poszukiwanie: wpatrywanie się w jeden punkt, wiercenie się, pochylanie ciała do przodu, skanowanie wzrokiem otoczenia w poszukiwaniu wskazówek.",
+      en: "The tension turns into active searching: staring at one point, fidgeting, leaning the body forward, scanning the environment for clues.",
+    },
+    function: {
+      pl: "Oczekiwanie istnieje po to, by napędzać aktywne zdobywanie informacji o otoczeniu — dzięki niemu organizm nie czeka biernie, tylko przygotowuje się i eksploruje z wyprzedzeniem.",
+      en: "Anticipation exists to drive the active gathering of information about the environment — thanks to it, the organism doesn't wait passively but prepares and explores in advance.",
+    },
+  },
+}
+
+// ─── Zakładka Teoria: treść ─────────────────────────────────────────
+// Źródło: Zakladka_Teoria__Propozycja_Przebudowy.md. Układ narracyjny zamiast wykładu:
+// teza → kontekst → spór → reguły gry → powrót do ćwiczenia. *tekst* = kursywa.
+type L = { pl: string; en: string }
+
+const THEORY = {
+  title: { pl: "Teoria — ale inaczej", en: "Theory — Differently" },
+  subtitle: {
+    pl: "Nie po to, żeby zdać egzamin. Po to, żeby zrozumieć, co robi twoje ciało, zanim zdążysz pomyśleć.",
+    en: "Not to pass a test. To understand what your body does before you even think.",
+  },
+  hook: {
+    eyebrow: { pl: "Teza", en: "The claim" },
+    title: { pl: "Nie musisz poczuć, żeby zagrać", en: "You Don't Have to Feel It to Play It" },
+    body: {
+      pl: "Przez większość XX wieku aktorów uczono, że emocja jest punktem wyjścia — najpierw poczuj, potem pokaż. Fizjolog William James i duński lekarz Carl Lange zaproponowali odwrotną kolejność: to nie strach każe ci uciekać — to ucieczka (przyspieszony puls, spięte mięśnie, płytki oddech) każe mózgowi nazwać to, co się dzieje, „strachem”. Emocja przychodzi *po* ciele, nie przed nim. Dla aktora to nie ciekawostka z podręcznika — to metoda: zbuduj Impuls (oddech, napięcie, tempo), a Emocja pojawi się sama, bez wymuszania.",
+      en: "For most of the 20th century, actors were taught that emotion comes first — feel it, then show it. Physiologist William James and Danish physician Carl Lange proposed the reverse: it isn't fear that makes you run — it's the running (racing pulse, tensed muscles, shallow breath) that makes the brain label what's happening as “fear.” Emotion arrives *after* the body, not before it. For an actor this isn't a textbook curiosity — it's a method: build the Impulse (breath, tension, tempo) and the Emotion will follow on its own, without forcing it.",
+    },
+    oldOrder: { pl: "Najpierw poczuj", en: "Feel first" },
+    newOrder: { pl: "James–Lange", en: "James–Lange" },
+    bodyWord: { pl: "Ciało", en: "Body" },
+    emotionWord: { pl: "Emocja", en: "Emotion" },
+  },
+  context: {
+    eyebrow: { pl: "Kontekst", en: "Context" },
+    title: { pl: "Człowiek, który zrobił mapę uczuć", en: "The Man Who Mapped Feelings" },
+    body: {
+      pl: "Robert Plutchik, amerykański psycholog, spędził dwie dekady (lata 60.–80. XX wieku) na pytaniu, które brzmi banalnie, dopóki nie spróbujesz na nie odpowiedzieć: ile jest właściwie emocji? Zamiast liczyć słowa w słowniku (angielski ma ich setki), spojrzał na zachowanie — swoje i innych gatunków. Doszedł do ośmiu wzorców reakcji, które da się znaleźć nie tylko u ludzi, ale i u zwierząt: coś, co pozwala uciec przed drapieżnikiem, coś, co przyciąga do partnera, coś, co odpycha od zepsutego jedzenia. Nazwał je emocjami podstawowymi i ułożył w koło — nie dlatego, że lubił ładne diagramy, tylko dlatego, że emocje sąsiadujące na kole mieszają się ze sobą równie łatwo, jak sąsiadujące kolory na palecie.",
+      en: "Robert Plutchik, an American psychologist, spent two decades (1960s–80s) chasing a question that sounds trivial until you try to answer it: how many emotions actually exist? Instead of counting words in a dictionary (English has hundreds), he looked at behavior — human and animal. He arrived at eight response patterns found across species: something that lets you flee a predator, something that pulls you toward a mate, something that pushes you away from spoiled food. He called them basic emotions and arranged them in a wheel — not because he liked neat diagrams, but because emotions that sit next to each other on the wheel blend as easily as neighboring colors on a palette.",
+    },
+    link: { pl: "Zobacz to w praktyce: Diady", en: "See it in practice: Dyads" },
+  },
+  debate: {
+    eyebrow: { pl: "Spór", en: "The debate" },
+    title: { pl: "Od środka czy od ciała? Spór, który wciąż trwa", en: "From the Inside or From the Body? A Debate Still Alive" },
+    body: {
+      pl: "Ta aplikacja łączy dwie teorie, które nie zawsze się ze sobą zgadzają — i warto to przyznać wprost, zamiast udawać, że nauka mówi jednym głosem. Plutchik opisuje emocję jako *ocenę sytuacji*: mózg rozpoznaje bodziec jako korzystny lub groźny, zanim jeszcze cokolwiek poczujesz. James i Lange twierdzą coś mocniejszego: że sama ocena to za mało — emocja *jest* odczytaniem reakcji ciała. To dokładnie ten sam spór, który od stu lat dzieli sale prób. Stanisławski uczył pracy „od środka” — pamięć emocjonalna, wyobraźnia, dopiero potem ciało. Meisner, Grotowski i technika fizyczna uczą odwrotnie — od konkretnego działania i impulsu ciała, emocja ma się pojawić jako efekt uboczny, nie cel. Ta aplikacja stoi bliżej tej drugiej szkoły: każda karta emocji pokazuje najpierw Impuls (co robi ciało), dopiero potem nazwę uczucia.",
+      en: "This app combines two theories that don't always agree with each other — and that's worth admitting outright, rather than pretending science speaks with one voice. Plutchik describes emotion as an *assessment of the situation*: the brain recognizes a stimulus as beneficial or threatening before you feel anything. James and Lange make a stronger claim: that assessment alone isn't enough — emotion *is* the reading of the body's reaction. This is exactly the debate that has split rehearsal rooms for a century. Stanislavski taught working “from the inside” — emotional memory and imagination first, the body second. Meisner, Grotowski, and physical-action technique teach the reverse — from concrete action and bodily impulse, with emotion appearing as a by-product, not a goal. This app leans toward the second school: every emotion card shows the Impulse (what the body does) before naming the feeling.",
+    },
+    schools: [
+      {
+        label: { pl: "Od środka", en: "From the inside" },
+        who: { pl: "Stanisławski", en: "Stanislavski" },
+        steps: { pl: "pamięć emocjonalna, wyobraźnia → ciało", en: "emotional memory, imagination → body" },
+        app: false,
+      },
+      {
+        label: { pl: "Od ciała", en: "From the body" },
+        who: { pl: "Meisner, Grotowski, technika fizyczna", en: "Meisner, Grotowski, physical action" },
+        steps: { pl: "działanie, impuls ciała → emocja", en: "action, bodily impulse → emotion" },
+        app: true,
+      },
+    ],
+    appLeans: { pl: "Bliżej tej szkoły stoi aplikacja", en: "This app leans this way" },
+  },
+  rules: {
+    eyebrow: { pl: "Reguły gry", en: "Rules of the game" },
+    title: { pl: "5 reguł, które warto znać, zanim zaczniesz losować karty", en: "5 Rules Worth Knowing Before You Start Drawing Cards" },
+    hint: { pl: "Dotknij reguły, żeby zobaczyć, co znaczy na scenie.", en: "Tap a rule to see what it means on stage." },
+    onStage: { pl: "Na scenie", en: "On stage" },
+    items: [
+      {
+        thesis: { pl: "Emocje są wspólne dla wszystkich gatunków.", en: "Emotions are shared across species." },
+        plutchik: {
+          pl: "Te same wzorce reakcji znajdziesz u człowieka i u zwierzęcia broniącego terytorium.",
+          en: "The same response patterns show up in humans and in an animal defending its territory.",
+        },
+        stage: {
+          pl: "Strach czy gniew, które grasz, nie są „kulturowe” — możesz czerpać z najbardziej fizycznej, zwierzęcej wersji impulsu, bez wstydu, że to „za mało subtelne”.",
+          en: "The fear or anger you're playing isn't “cultural” — you can draw on the rawest, most animal version of the impulse without worrying it's “too unsubtle.”",
+        },
+      },
+      {
+        thesis: { pl: "Jest ich niewiele, reszta to mieszanki.", en: "There are few of them, everything else is a mix." },
+        plutchik: {
+          pl: "8 podstawowych, wszystko inne — jak zazdrość czy nostalgia — to ich kombinacje.",
+          en: "8 basic ones; everything else — jealousy, nostalgia — is a combination.",
+        },
+        stage: {
+          pl: "Skomplikowana postać to nie osobna, tajemnicza emocja do odkrycia — to zwykle dwie znane ci już emocje, zmieszane w niewłaściwych proporcjach.",
+          en: "A complicated character isn't some separate, mysterious emotion to discover — it's usually two emotions you already know, mixed in the wrong proportions.",
+        },
+        link: { view: "dyads", label: { pl: "Zobacz Diady", en: "See the Dyads" } },
+      },
+      {
+        thesis: { pl: "Mają różne natężenie.", en: "They vary in intensity." },
+        plutchik: {
+          pl: "Każda emocja rozciąga się od słabej do ekstremalnej wersji (np. spokój → radość → euforia).",
+          en: "Every emotion spans from mild to extreme (e.g. serenity → joy → ecstasy).",
+        },
+        stage: {
+          pl: "„Zagraj radość” to złe zadanie reżyserskie. „Zagraj radość na 3 z 10, potem na 9 z 10” — to konkretne, mierzalne zadanie aktorskie. Drabinę intensywności znajdziesz na karcie każdej emocji.",
+          en: "“Play joy” is a bad direction. “Play joy at 3 out of 10, then at 9 out of 10” is a concrete, playable task. You'll find the intensity ladder on each emotion's card.",
+        },
+        link: { view: "catalog", label: { pl: "Otwórz Katalog", en: "Open the Catalog" } },
+      },
+      {
+        thesis: { pl: "Emocje mają swoje przeciwieństwa i nie mieszają się z nimi.", en: "Emotions have opposites and don't blend with them." },
+        plutchik: {
+          pl: "Radość i smutek, zaufanie i wstręt — leżą naprzeciw siebie na kole i wykluczają się w danym momencie.",
+          en: "Joy and sadness, trust and disgust sit opposite each other on the wheel and cancel each other out in the moment.",
+        },
+        stage: {
+          pl: "Jeśli scena wymaga gwałtownej zmiany z radości w smutek, to nie jest płynne przejście — to twarde cięcie. Zagraj je jako cięcie, nie jako gradient.",
+          en: "If a scene demands a sudden swing from joy to sadness, that's not a smooth transition — it's a hard cut. Play it as a cut, not a gradient.",
+        },
+      },
+      {
+        thesis: { pl: "Wszystkie służą przetrwaniu, nawet te „negatywne”.", en: "All of them serve survival, even the “negative” ones." },
+        plutchik: {
+          pl: "Każda emocja — łącznie ze strachem, wstrętem czy gniewem — ma funkcję biologiczną, żadna nie jest błędem systemu.",
+          en: "Every emotion — including fear, disgust, or anger — has a biological function; none of them is a system error.",
+        },
+        stage: {
+          pl: "Najczęstszy błąd młodego aktora to granie gniewu czy strachu jako „utraty kontroli”. To odwrotność prawdy — to najbardziej funkcjonalne, celowe stany, jakie ma ciało. Zagraj cel, nie chaos.",
+          en: "The most common beginner mistake is playing anger or fear as “losing control.” It's the opposite of the truth — these are the most functional, purposeful states the body has. Play the purpose, not the chaos.",
+        },
+      },
+    ] as { thesis: L; plutchik: L; stage: L; link?: { view: "dyads" | "catalog"; label: L } }[],
+  },
+  cta: {
+    eyebrow: { pl: "Praktyka", en: "Practice" },
+    title: { pl: "Teraz zobacz, jak to działa w ciele", en: "Now See How It Works in the Body" },
+    body: {
+      pl: "Teoria kończy się tutaj — reszta dzieje się w ćwiczeniu. Wylosuj kartę, przeczytaj Impuls, zanim przeczytasz nazwę emocji, i spróbuj zbudować go w ciele, zanim zdecydujesz, co „grasz”.",
+      en: "The theory ends here — the rest happens in practice. Draw a card, read the Impulse before you read the emotion's name, and try building it in your body before deciding what you're “playing.”",
+    },
+    draw: { pl: "Losuj kartę", en: "Draw a Card" },
+    dyads: { pl: "Zobacz Diady", en: "See the Dyads" },
+  },
+}
+
+// *tekst* → kursywa (jedyne formatowanie potrzebne w tekstach teorii)
+const rich = (text: string) =>
+  text.split(/(\*[^*]+\*)/).map((part, i) =>
+    part.length > 2 && part.startsWith("*") && part.endsWith("*") ? <em key={i}>{part.slice(1, -1)}</em> : part
+  )
+
 // ─── Dyads Logic ──────────────────────────────────────────────────
 interface DyadResult {
   name: { pl: string; en: string }
@@ -535,42 +830,122 @@ const mixHex = (base: string, top: string, alpha: number) => {
 
 // ─── Sub-components ───────────────────────────────────────────────
 
+// Łańcuch Bodziec → Impuls → Emocja → Działanie → Cel. Cztery etapy (bez "Emocji") to przyciski:
+// klik rozwija wyjaśnienie tuż pod etapem (na telefonie) albo pod całym rzędem (od md).
+// Świadomie NIE osobny modal: to już jest okno dialogowe, a okno w oknie na telefonie
+// zasłania łańcuch, który właśnie się czyta, i komplikuje gest "wstecz".
 const EvoChain = ({ emotion, lang, isDark }: { emotion: Emotion, lang: 'pl'|'en', isDark: boolean }) => {
   const t = uiTranslations[lang].modal
-  return (
-    <div className={`flex flex-col md:flex-row items-center justify-between gap-3 p-4 rounded-xl border mb-6 ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
-        <div className="text-center flex-1">
-            <span className="text-xs uppercase tracking-widest opacity-60 font-bold">{t.stimulus}</span>
-            <p className="font-bold text-sm mt-1">{emotion.stimulus[lang]}</p>
-        </div>
-        <ArrowRight className="hidden md:block opacity-40 w-5 h-5" />
-        <ArrowDown className="md:hidden opacity-40 w-5 h-5" />
-        
-        <div className={`text-center flex-1 p-2 rounded-lg border ${isDark ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200"}`}>
-            <span className={`text-xs uppercase tracking-widest font-bold ${isDark ? 'text-teal-400' : 'text-teal-600'}`}>{t.impulse}</span>
-            <p className="italic text-sm mt-1 font-serif">"{emotion.impulse[lang]}"</p>
-        </div>
-        <ArrowRight className="hidden md:block opacity-40 w-5 h-5" />
-        <ArrowDown className="md:hidden opacity-40 w-5 h-5" />
+  const [open, setOpen] = useState<MechanismStep | null>(null)
+  const stepRefs = useRef<Partial<Record<MechanismStep, HTMLButtonElement | null>>>({})
+  const panelRef = useRef<HTMLDivElement>(null)
+  const scrollToPanel = useRef(false)
 
-        <div className={`text-center flex-1 p-3 rounded-xl border border-current ${emotion.bgLightClass} ${isDark ? emotion.colorClass : emotion.textLightClass}`}>
+  // Nowa emocja = łańcuch od zera
+  useEffect(() => { setOpen(null) }, [emotion.id])
+
+  // Po "Dalej" panel przeskakuje niżej — dociągamy go do widoku
+  useEffect(() => {
+    if (!open || !scrollToPanel.current) return
+    scrollToPanel.current = false
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    panelRef.current?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" })
+  }, [open])
+
+  const labels: Record<MechanismStep, string> = { stimulus: t.stimulus, impulse: t.impulse, action: t.action, function: t.bioGoal }
+  const values: Record<MechanismStep, string> = {
+    stimulus: emotion.stimulus[lang], impulse: emotion.impulse[lang], action: emotion.action[lang], function: emotion.function[lang],
+  }
+  const accent = isDark ? "text-teal-400" : "text-teal-700"
+
+  const goNext = (step: MechanismStep) => {
+    const next = MECHANISM_STEPS[MECHANISM_STEPS.indexOf(step) + 1]
+    if (!next) return
+    scrollToPanel.current = true
+    setOpen(next)
+    stepRefs.current[next]?.focus({ preventScroll: true })
+  }
+
+  const stepButton = (step: MechanismStep, variant: string, valueClass: string, value: React.ReactNode) => {
+    const isOpen = open === step
+    return (
+      <button
+        ref={(el) => { stepRefs.current[step] = el }}
+        type="button"
+        id={`mech-${emotion.id}-${step}`}
+        aria-expanded={isOpen}
+        aria-controls={isOpen ? `mech-panel-${emotion.id}` : undefined}
+        onClick={() => setOpen(isOpen ? null : step)}
+        className={`group w-full md:w-auto md:flex-1 min-h-11 text-center p-2.5 rounded-lg border cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${variant}`}
+        style={isOpen ? { boxShadow: `0 0 0 2px ${emotion.hex}` } : undefined}
+      >
+        <span className={`flex items-center justify-center gap-1 text-xs uppercase tracking-widest font-bold ${step === "impulse" ? accent : "opacity-70"}`}>
+          {labels[step]}
+          <ChevronDown aria-hidden="true" className={`w-3.5 h-3.5 transition-transform motion-reduce:transition-none ${isOpen ? "rotate-180" : ""}`} />
+        </span>
+        <span className={`block mt-1 ${valueClass}`}>{value}</span>
+      </button>
+    )
+  }
+
+  const panel = (step: MechanismStep) => {
+    const next = MECHANISM_STEPS[MECHANISM_STEPS.indexOf(step) + 1]
+    return (
+      <div
+        ref={panelRef}
+        key={`panel-${step}`}
+        id={`mech-panel-${emotion.id}`}
+        role="region"
+        aria-labelledby={`mech-${emotion.id}-${step}`}
+        className={`w-full md:basis-full md:order-last text-left rounded-xl border border-l-4 p-4 sm:p-5 animate-fade ${isDark ? "bg-slate-900 border-slate-700" : "bg-slate-50 border-slate-200"}`}
+        style={{ borderLeftColor: emotion.hex }}
+      >
+        <p className="text-xs uppercase tracking-widest font-bold opacity-70">
+          {labels[step]} — {values[step]}
+        </p>
+        <p className="text-sm sm:text-base leading-relaxed mt-2">{MECHANISM[emotion.id][step][lang]}</p>
+        {next && (
+          <button
+            type="button"
+            onClick={() => goNext(step)}
+            className={`mt-3 -ml-2 px-2 min-h-11 inline-flex items-center gap-1.5 rounded-lg text-sm font-bold cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-current ${accent} ${isDark ? "hover:bg-slate-800" : "hover:bg-slate-200"}`}
+          >
+            {t.next}: {labels[next]}
+            <ArrowRight aria-hidden="true" className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    )
+  }
+
+  const arrow = (k: string) => (
+    <ArrowDown key={k} aria-hidden="true" className="opacity-40 w-5 h-5 shrink-0 md:-rotate-90" />
+  )
+
+  const neutral = isDark ? "border-slate-700 hover:bg-slate-800" : "border-slate-200 hover:bg-slate-50"
+
+  return (
+    <div className={`flex flex-col md:flex-row md:flex-wrap items-center justify-between gap-3 p-3 sm:p-4 rounded-xl border mb-3 ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
+        {stepButton("stimulus", neutral, "font-bold text-sm", emotion.stimulus[lang])}
+        {open === "stimulus" && panel("stimulus")}
+        {arrow("a1")}
+
+        {stepButton("impulse", isDark ? "bg-slate-800 border-slate-700 hover:bg-slate-700" : "bg-slate-50 border-slate-200 hover:bg-slate-100", "italic text-sm font-serif", <>"{emotion.impulse[lang]}"</>)}
+        {open === "impulse" && panel("impulse")}
+        {arrow("a2")}
+
+        <div className={`w-full md:w-auto text-center md:flex-1 p-3 rounded-xl border border-current ${emotion.bgLightClass} ${isDark ? emotion.colorClass : emotion.textLightClass}`}>
             <span className="text-xs uppercase tracking-widest opacity-70 font-bold">{t.emotion}</span>
             <p className="font-black text-lg leading-tight mt-0.5">{emotion.name[lang]}</p>
         </div>
-        <ArrowRight className="hidden md:block opacity-40 w-5 h-5" />
-        <ArrowDown className="md:hidden opacity-40 w-5 h-5" />
+        {arrow("a3")}
 
-        <div className="text-center flex-1">
-            <span className="text-xs uppercase tracking-widest opacity-60 font-bold">{t.action}</span>
-            <p className="font-bold text-sm mt-1">{emotion.action[lang]}</p>
-        </div>
-        <ArrowRight className="hidden md:block opacity-40 w-5 h-5" />
-        <ArrowDown className="md:hidden opacity-40 w-5 h-5" />
+        {stepButton("action", neutral, "font-bold text-sm", emotion.action[lang])}
+        {open === "action" && panel("action")}
+        {arrow("a4")}
 
-        <div className={`text-center flex-1 p-2 rounded-lg ${isDark ? "bg-slate-900" : "bg-slate-100"}`}>
-            <span className="text-xs uppercase tracking-widest opacity-60 font-bold">{t.bioGoal}</span>
-            <p className={`font-bold text-xs mt-1 ${isDark ? 'text-teal-400' : 'text-teal-600'}`}>{emotion.function[lang]}</p>
-        </div>
+        {stepButton("function", isDark ? "bg-slate-900 border-slate-800 hover:bg-slate-800" : "bg-slate-100 border-slate-200 hover:bg-slate-200", `font-bold text-xs ${accent}`, emotion.function[lang])}
+        {open === "function" && panel("function")}
     </div>
   )
 }
@@ -692,6 +1067,13 @@ const App: React.FC = () => {
     }
   }, [selectedEmotion])
 
+  // Przejście między zakładkami z treści (np. z końca Teorii) — zawsze od góry nowego widoku
+  const goTo = (next: "shuffle" | "dyads" | "catalog" | "manifesto") => {
+    setView(next)
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" })
+  }
+
   const isDark = stageMode === "dark"
   const t = uiTranslations[lang]
   const nameColor = (e: Emotion) => (isDark ? e.colorClass : e.textLightClass)
@@ -719,6 +1101,9 @@ const App: React.FC = () => {
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-roulette, .animate-fade, .animate-slide { animation-duration: 1ms; }
+        }
       `}</style>
 
       {/* Header */}
@@ -998,76 +1383,172 @@ const App: React.FC = () => {
         )}
 
         {/* ─── MANIFESTO / THEORY VIEW ─── */}
-        {view === "manifesto" && (
-          <div className="w-full max-w-3xl animate-fade space-y-6 sm:space-y-8 pb-12 sm:pb-20 px-2 sm:px-0">
-            <section className={`p-6 sm:p-8 rounded-3xl border-l-8 ${isDark ? "bg-slate-900 border-slate-500" : "bg-white border-slate-800 shadow-lg"}`}>
-              <h3 className="text-xl sm:text-2xl font-black uppercase mb-3 sm:mb-4 flex items-center gap-2">
-                <BookOpen size={24} className="text-slate-500 shrink-0" />
-                {lang === "pl" ? "Teoria Emocji Plutchika" : "Plutchik's Theory of Emotions"}
-              </h3>
-              <p className="text-sm sm:text-base opacity-90 leading-relaxed mb-4">
-                {lang === "pl"
-                  ? "W latach 1960-1980 amerykański psycholog Robert Plutchik opracował ewolucyjną teorię emocji. Zaproponował istnienie 8 emocji podstawowych. Są one wrodzone i bezpośrednio odnoszą się do zachowań adaptacyjnych, które mają na celu pomoc w przetrwaniu."
-                  : "Between 1960-1980, American psychologist Robert Plutchik developed an evolutionary theory of emotion. He proposed the existence of 8 basic emotions. They are innate and directly relate to adaptive behaviors aimed at helping in survival."}
-              </p>
-              <p className={`text-xs uppercase tracking-widest font-bold inline-block px-3 py-1.5 rounded-lg ${isDark ? "bg-slate-800 text-slate-300" : "bg-slate-100 text-slate-600"}`}>
-                {lang === "pl" ? "Z nich wynikają wszystkie inne emocje." : "All other emotions stem from them."}
-              </p>
-            </section>
+        {/* Układ narracyjny w jednej kolumnie (~65 znaków w wierszu) — czytany kciukiem od góry do dołu.
+            Każda sekcja ma "etykietę rozdziału" (1/5…), żeby było widać, ile zostało do końca. */}
+        {view === "manifesto" && (() => {
+          const card = isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200 shadow-sm"
+          const eyebrow = (n: number, label: L) => (
+            <p className="text-xs font-mono font-bold uppercase tracking-widest opacity-70 mb-2">
+              {n}/5 · {label[lang]}
+            </p>
+          )
+          const linkBtn = isDark
+            ? "text-teal-300 hover:bg-slate-800"
+            : "text-teal-800 hover:bg-slate-100"
+          return (
+            <article className="w-full max-w-2xl animate-fade space-y-5 sm:space-y-6 pb-12 sm:pb-20 px-1 sm:px-0">
+              <header className="text-center px-2 mb-2 sm:mb-4">
+                <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight">{THEORY.title[lang]}</h2>
+                <p className="text-sm sm:text-base opacity-80 leading-relaxed mt-2 max-w-xl mx-auto">{THEORY.subtitle[lang]}</p>
+              </header>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <section className={`p-5 sm:p-6 rounded-3xl border ${isDark ? "bg-slate-900 border-slate-800" : "bg-slate-50 border-slate-200 shadow-sm"}`}>
-                <h4 className="font-black uppercase text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-2">
-                  <Combine size={18} className="text-blue-500 shrink-0" />
-                  {lang === "pl" ? "Podstawowa idea i Diady" : "Basic Idea and Dyads"}
-                </h4>
-                <p className="text-xs sm:text-sm leading-relaxed opacity-80">
-                  {lang === "pl"
-                    ? "Możemy przeżywać mieszaninę pierwotnych emocji. Łączenie ich w jedność tworzy bardziej złożone emocje zwane diadami. Emocje przeciwległe na kole są emocjami przeciwnymi i według Plutchika nie możemy doświadczać ich jednocześnie (tworzą konflikt)."
-                    : "We can experience a mixture of primary emotions. Combining them into one creates more complex emotions called dyads. Opposite emotions on the wheel are contradictory and according to Plutchik, we cannot experience them at the same time (they create a conflict)."}
-                </p>
+              {/* 1 — Teza */}
+              <section className={`p-5 sm:p-8 rounded-3xl border-l-8 ${isDark ? "bg-slate-900 border-teal-500" : "bg-white border-teal-700 shadow-lg"}`}>
+                {eyebrow(1, THEORY.hook.eyebrow)}
+                <h3 className="text-xl sm:text-2xl font-black uppercase leading-tight mb-4">{THEORY.hook.title[lang]}</h3>
+                {/* Odwrócona kolejność jako obraz, zanim padnie wyjaśnienie */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-5 text-sm" aria-hidden="true">
+                  <div className={`p-3 rounded-xl border ${isDark ? "border-slate-700 text-slate-400" : "border-slate-200 text-slate-600"}`}>
+                    <span className="block text-xs uppercase tracking-widest font-bold mb-1">{THEORY.hook.oldOrder[lang]}</span>
+                    <span className="font-bold line-through decoration-2">{THEORY.hook.emotionWord[lang]} → {THEORY.hook.bodyWord[lang]}</span>
+                  </div>
+                  <div className={`p-3 rounded-xl border-2 ${isDark ? "border-teal-500 bg-teal-500/10" : "border-teal-700 bg-teal-50"}`}>
+                    <span className={`block text-xs uppercase tracking-widest font-bold mb-1 ${isDark ? "text-teal-300" : "text-teal-800"}`}>{THEORY.hook.newOrder[lang]}</span>
+                    <span className="font-black">{THEORY.hook.bodyWord[lang]} → {THEORY.hook.emotionWord[lang]}</span>
+                  </div>
+                </div>
+                <p className="text-base leading-relaxed opacity-90">{rich(THEORY.hook.body[lang])}</p>
               </section>
 
-              <section className={`p-5 sm:p-6 rounded-3xl border ${isDark ? "bg-slate-900 border-slate-800" : "bg-slate-50 border-slate-200 shadow-sm"}`}>
-                <h4 className="font-black uppercase text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-2">
-                  <HeartPulse size={18} className="text-red-500 shrink-0" />
-                  {lang === "pl" ? "Znaczenie dla przetrwania" : "Importance for Survival"}
-                </h4>
-                <p className="text-xs sm:text-sm leading-relaxed opacity-80">
-                  {lang === "pl"
-                    ? "Wydarzenia uruchamiają adekwatne emocje, co z kolei powoduje konkretne działania pasujące do bodźca. Na przykład: zjedzenie trującego obiektu aktywuje wstręt, co skutkuje wymiotowaniem, by pozbyć się zagrożenia."
-                    : "Events trigger adequate emotions, which in turn cause specific actions matching the stimulus. For example: eating a toxic object activates disgust, which results in vomiting to get rid of the threat."}
-                </p>
+              {/* 2 — Kontekst */}
+              <section className={`p-5 sm:p-8 rounded-3xl border ${card}`}>
+                {eyebrow(2, THEORY.context.eyebrow)}
+                <h3 className="text-lg sm:text-xl font-black uppercase leading-tight mb-3 flex items-center gap-2">
+                  <BookOpen size={20} className="shrink-0 opacity-60" aria-hidden="true" />
+                  {THEORY.context.title[lang]}
+                </h3>
+                <p className="text-base leading-relaxed opacity-90">{THEORY.context.body[lang]}</p>
+                <button
+                  type="button"
+                  onClick={() => goTo("dyads")}
+                  className={`mt-3 -ml-2 px-2 min-h-11 inline-flex items-center gap-1.5 rounded-lg text-sm font-bold cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-current ${linkBtn}`}
+                >
+                  <Combine size={16} aria-hidden="true" />
+                  {THEORY.context.link[lang]}
+                  <ArrowRight size={16} aria-hidden="true" />
+                </button>
               </section>
-            </div>
 
-            <section className={`p-6 sm:p-8 rounded-3xl border ${isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200 shadow-md"}`}>
-              <h4 className="font-black uppercase text-sm sm:text-base mb-5 sm:mb-6 flex items-center gap-2">
-                <Layers size={18} className="text-amber-500 shrink-0" />
-                {lang === "pl" ? "10 Postulatów Plutchika" : "10 Postulates of Plutchik"}
-              </h4>
-              <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-xs sm:text-sm opacity-80">
-                {[
-                  { pl: "Emocje występują na wszystkich poziomach ewolucji.", en: "Emotions apply to all evolutionary levels." },
-                  { pl: "Mają ewolucyjne podłoże i u różnych gatunków rozwinęły różne formy ekspresji.", en: "They have an evolutionary basis and evolved different forms of expression." },
-                  { pl: "Pełnią rolę adaptacyjną, pomagając przetrwać zagrożenia.", en: "They play an adaptive role, helping to survive threats." },
-                  { pl: "Mimo różnic, można zidentyfikować wspólne wzorce u gatunków.", en: "Despite differences, common patterns can be identified across species." },
-                  { pl: "Istnieje niewielka liczba podstawowych, pierwotnych emocji.", en: "There is a small number of basic, primary emotions." },
-                  { pl: "Wszystkie inne emocje to kombinacje i mieszaniny podstawowych.", en: "All other emotions are combinations and mixtures of the basic ones." },
-                  { pl: "Pierwotne emocje to hipotetyczne konstrukty i stany idealne.", en: "Primary emotions are hypothetical constructs and ideal states." },
-                  { pl: "Można je scharakteryzować jako pary biegunowych przeciwieństw.", en: "They can be characterized as pairs of polar opposites." },
-                  { pl: "Emocje różnią się stopniem podobieństwa do siebie.", en: "Emotions vary in their degree of similarity to one another." },
-                  { pl: "Każda emocja ma różne stopnie natężenia i pobudzenia.", en: "Each emotion can exist in varying degrees of intensity and arousal." },
-                ].map((postulate, idx) => (
-                  <li key={idx} className="flex gap-3 items-start">
-                    <span className="font-black text-amber-500 w-4 shrink-0 mt-0.5">{idx + 1}.</span>
-                    <span className="leading-relaxed">{postulate[lang]}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          </div>
-        )}
+              {/* 3 — Spór */}
+              <section className={`p-5 sm:p-8 rounded-3xl border ${card}`}>
+                {eyebrow(3, THEORY.debate.eyebrow)}
+                <h3 className="text-lg sm:text-xl font-black uppercase leading-tight mb-3 flex items-center gap-2">
+                  <Drama size={20} className="shrink-0 opacity-60" aria-hidden="true" />
+                  {THEORY.debate.title[lang]}
+                </h3>
+                <p className="text-base leading-relaxed opacity-90 mb-5">{rich(THEORY.debate.body[lang])}</p>
+                {/* Streszczenie sporu w dwóch kolumnach; pozycja aplikacji oznaczona tekstem, nie tylko kolorem */}
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {THEORY.debate.schools.map((s) => (
+                    <li
+                      key={s.label.en}
+                      className={`p-4 rounded-2xl border-2 ${
+                        s.app
+                          ? isDark ? "border-teal-500 bg-teal-500/10" : "border-teal-700 bg-teal-50"
+                          : isDark ? "border-slate-700" : "border-slate-200"
+                      }`}
+                    >
+                      <span className="block font-black uppercase text-sm">{s.label[lang]}</span>
+                      <span className="block text-sm opacity-80 mt-0.5">{s.who[lang]}</span>
+                      <span className="block text-sm font-semibold mt-2">{s.steps[lang]}</span>
+                      {s.app && (
+                        <span className={`inline-flex items-center gap-1 mt-3 text-xs font-bold uppercase tracking-wider ${isDark ? "text-teal-300" : "text-teal-800"}`}>
+                          <Target size={14} aria-hidden="true" /> {THEORY.debate.appLeans[lang]}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              {/* 4 — Reguły gry: rozwijane karty (natywne <details>: klawiatura i czytnik ekranu za darmo) */}
+              <section className={`p-5 sm:p-8 rounded-3xl border ${card}`}>
+                {eyebrow(4, THEORY.rules.eyebrow)}
+                <h3 className="text-lg sm:text-xl font-black uppercase leading-tight mb-1 flex items-center gap-2">
+                  <Layers size={20} className="shrink-0 opacity-60" aria-hidden="true" />
+                  {THEORY.rules.title[lang]}
+                </h3>
+                <p className="text-sm opacity-80 mb-4">{THEORY.rules.hint[lang]}</p>
+                <div className="space-y-2">
+                  {THEORY.rules.items.map((rule, idx) => (
+                    <details
+                      key={idx}
+                      className={`group rounded-2xl border transition-colors ${isDark ? "border-slate-700 open:bg-slate-800/60" : "border-slate-200 open:bg-slate-50"}`}
+                    >
+                      <summary
+                        className={`list-none [&::-webkit-details-marker]:hidden flex items-start gap-3 p-4 min-h-11 cursor-pointer rounded-2xl focus-visible:outline-2 focus-visible:outline-current ${isDark ? "hover:bg-slate-800" : "hover:bg-slate-50"}`}
+                      >
+                        <span className={`font-black text-lg leading-6 w-6 shrink-0 ${isDark ? "text-amber-400" : "text-amber-700"}`}>{idx + 1}</span>
+                        <span className="flex-1 font-bold text-base leading-6">{rule.thesis[lang]}</span>
+                        <ChevronDown aria-hidden="true" className="w-5 h-5 mt-0.5 shrink-0 opacity-60 transition-transform motion-reduce:transition-none group-open:rotate-180" />
+                      </summary>
+                      <div className="px-4 pb-4 sm:pl-13 space-y-3 animate-fade">
+                        <p className="text-sm leading-relaxed opacity-80">
+                          <span className="font-bold">Plutchik: </span>{rule.plutchik[lang]}
+                        </p>
+                        <p className={`text-base leading-relaxed p-3 rounded-xl border-l-4 ${isDark ? "bg-slate-900 border-teal-500" : "bg-white border-teal-700"}`}>
+                          <span className={`block text-xs font-bold uppercase tracking-widest mb-1 ${isDark ? "text-teal-300" : "text-teal-800"}`}>
+                            {THEORY.rules.onStage[lang]}
+                          </span>
+                          {rule.stage[lang]}
+                        </p>
+                        {rule.link && (
+                          <button
+                            type="button"
+                            onClick={() => goTo(rule.link!.view)}
+                            className={`-ml-2 px-2 min-h-11 inline-flex items-center gap-1.5 rounded-lg text-sm font-bold cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-current ${linkBtn}`}
+                          >
+                            {rule.link.label[lang]}
+                            <ArrowRight size={16} aria-hidden="true" />
+                          </button>
+                        )}
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </section>
+
+              {/* 5 — Powrót do praktyki: główna akcja pełnej szerokości, w zasięgu kciuka */}
+              <section className={`p-5 sm:p-8 rounded-3xl border-2 border-dashed text-center ${isDark ? "border-slate-700" : "border-slate-300"}`}>
+                {eyebrow(5, THEORY.cta.eyebrow)}
+                <h3 className="text-xl sm:text-2xl font-black uppercase leading-tight mb-3">{THEORY.cta.title[lang]}</h3>
+                <p className="text-base leading-relaxed opacity-90 mb-6 max-w-xl mx-auto">{THEORY.cta.body[lang]}</p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <button
+                    type="button"
+                    onClick={() => { goTo("shuffle"); handleShuffle() }}
+                    className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 min-h-14 rounded-2xl text-lg font-black transition-all active:scale-95 shadow-xl cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${
+                      isDark ? "bg-slate-100 text-slate-900 hover:bg-white" : "bg-slate-900 text-white hover:bg-slate-800"
+                    }`}
+                  >
+                    <Shuffle size={20} aria-hidden="true" />
+                    {THEORY.cta.draw[lang]}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => goTo("dyads")}
+                    className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 min-h-14 rounded-2xl text-lg font-black border-2 transition-all active:scale-95 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${
+                      isDark ? "border-slate-600 hover:bg-slate-800" : "border-slate-900 hover:bg-slate-100"
+                    }`}
+                  >
+                    <Combine size={20} aria-hidden="true" />
+                    {THEORY.cta.dyads[lang]}
+                  </button>
+                </div>
+              </section>
+            </article>
+          )
+        })()}
 
       </main>
 
@@ -1108,7 +1589,8 @@ const App: React.FC = () => {
             {/* Treść Modala */}
             <div className="p-6 sm:p-8 space-y-8">
               <section>
-                <h3 className="text-xs font-bold uppercase tracking-widest opacity-60 mb-4">{t.modal.mechanism}</h3>
+                <h3 className="text-xs font-bold uppercase tracking-widest opacity-60 mb-1">{t.modal.mechanism}</h3>
+                <p className="text-sm opacity-80 mb-4">{t.modal.mechanismHint}</p>
                 <EvoChain emotion={selectedEmotion} lang={lang} isDark={isDark} />
                 <p className="text-xs opacity-70 text-center italic mt-2">{t.modal.neuroception}</p>
               </section>
